@@ -14,7 +14,7 @@ class Aruco_detector:
         self.pose_tello = Pose()
         self.pose_world_to_tello = Pose()
         self.marker_size_world = 0.04
-        self.marker_size_tello = 0.015
+        self.marker_size_tello = 0.02
         self.image = np.zeros((1, 1), dtype=np.float32)
         self.is_detected = False
 
