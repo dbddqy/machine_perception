@@ -2,6 +2,7 @@ from aruco_detection import *
 
 solver = Aruco_detector()
 
+
 while True:
     solver.detect()
     cv2.imshow("video", solver.image)
