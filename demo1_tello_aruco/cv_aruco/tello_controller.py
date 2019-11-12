@@ -1,6 +1,7 @@
 from simple_pid import PID
 from time import sleep
 
+
 class Tello_controller:
     # initial a tello object in main script, pass it in to the function
     def __init__(self, drone):
@@ -13,14 +14,14 @@ class Tello_controller:
         }
         self.axis_speed = {"x": 0.0, "y": 0.0, "z": 0.0, "yaw": 0.0}
         self.prev_axis_speed = self.axis_speed.copy()
-        self.pid_x = PID(0.5, 0, 0, setpoint=0, output_limits=(-20, 20))  # for x
-        self.pid_y = PID(0.5, 0, 0, setpoint=0, output_limits=(-20, 20))  # for y
-        self.pid_z = PID(0.5, 0, 0, setpoint=0, output_limits=(-20, 20))  # for z
-        self.pid_yaw = PID(0.5, 0, 0, setpoint=0, output_limits=(-50, 50))  # for yaw
+        self.pid_x = PID(0.5, 0.04, 0, setpoint=0, output_limits=(-10, 10))  # for x
+        self.pid_y = PID(0.5, 0.04, 0, setpoint=0, output_limits=(-10, 10))  # for y
+        self.pid_z = PID(0.5, 0.04, 0, setpoint=0, output_limits=(-10, 10))  # for z
+        self.pid_yaw = PID(0.5, 0.04, 0, setpoint=0, output_limits=(-10, 10))  # for yaw
         self.ref_pose = None
         self.drone_pose = [0.0, 0.0, 0.0, 0.0]
         self.error = [0.0, 0.0, 0.0, 0.0]
-        self.tolerance = [1.0, 1.0, 1.0, 1.0]
+        self.tolerance = [3.0, 3.0, 3.0, 3.0]
 
     # set axis speed and send flight command to the drone
     def send_flight_command(self):
@@ -67,7 +68,6 @@ class Tello_controller:
     def update_drone_pose(self, drone_pose: list):
         self.drone_pose = drone_pose
         print("current drone_pose", self.drone_pose)
-
 
     # update pid control data
     def update_axis_speed(self):
