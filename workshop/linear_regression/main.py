@@ -22,28 +22,32 @@ def loss(_x, _y, _theta, _model):
     return _loss / len(_x)
 
 
+def gradient(_x, _y, _theta, _model):
+    g = np.array([0.0, 0.0])
+    for i in range(len(_x)):
+        g[0] += (model(_x[i], _theta) - _y[i]) * _x[i]
+        g[1] += (model(_x[i], _theta) - _y[i])
+    return g
+
+
 def train(_x, _y, _theta, _model, lr=1e-5, steps=1000):
     for step in range(steps):
-        gradient = [0.0, 0.0]
-        for i in range(len(_x)):
-            gradient[0] += (model(_x[i], _theta) - _y[i]) * _x[i]
-            gradient[1] += (model(_x[i], _theta) - _y[i])
-        _theta[0] -= lr * gradient[0]
-        _theta[1] -= lr * gradient[1]
+        _theta -= lr * gradient(_x, _y, _theta, _model)
         # print log
         if step % 100 == 0:
             print("step: %d, theta: %f %f, loss: %f" % (step, _theta[0], _theta[1], loss(_x, _y, _theta, _model)))
+    return _theta
 
 
 if __name__ == "__main__":
-    x_train, y_train = generate_data(200, 2.0, 0.5)
-    theta = [1.0, 0.0]
-
+    x_train, y_train = generate_data(100, 2.0, 0.5)
+    theta = np.array([1.0, 0.0])
+    # plot x, y data
     plt.scatter(x_train, y_train, color="red")
-
-    train(x_train, y_train, theta, model, steps=10000)
-
-    y_new = model(x_train, theta)
+    # training
+    theta_new = train(x_train, y_train, theta, model, steps=1000)
+    # plot line
+    y_new = model(x_train, theta_new)
     plt.plot(x_train, y_new)
     plt.show()
 
