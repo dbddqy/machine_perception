@@ -4,13 +4,12 @@ from matplotlib import pyplot as plt
 
 def generate_data(n, p=0.8):
     # p: percentage of data for training
-    mean = [4., 3.]
-    cov = [[4., 0.], [0., 1.]]
-    x1 = np.random.multivariate_normal(mean, cov, n)
+    x11 = np.random.multivariate_normal([4., 3.], [[4., 0.], [0., 1.]], int(0.5*n))
+    x12 = np.random.multivariate_normal([2., -2.], [[1., 0.], [0., 2.]], int(0.25*n))
+    x13 = np.random.multivariate_normal([7., -4.], [[1., 0.], [0., 1.]], int(0.25 * n))
+    x1 = np.vstack((x11, x12, x13))
     plt.scatter(x1.T[0], x1.T[1], color="red")
-    mean = [6., 0.]
-    cov = [[1.5, 0.5], [0.5, 1.5]]
-    x2 = np.random.multivariate_normal(mean, cov, n)
+    x2 = np.random.multivariate_normal([6., 0.], [[1.5, 0.5], [0.5, 1.5]], n)
     plt.scatter(x2.T[0], x2.T[1], color="blue")
     # combine data
     x = np.vstack((x1, x2))
@@ -108,7 +107,7 @@ def train(_x, _y, _theta, _model, lr=1e-5, steps=1000):
 
 def plot_boundary(_theta, _color):
     x_plot = np.arange(-2., 10., .1)
-    y_plot = np.arange(-2., 10., .1)
+    y_plot = np.arange(-6., 6., .1)
     x_plot, y_plot = np.meshgrid(x_plot, y_plot)
     f = np.zeros(x_plot.shape)
     for i in range(x_plot.shape[0]):
@@ -127,7 +126,7 @@ if __name__ == "__main__":
     # plot boundary before training
     plot_boundary(theta, "orange")
     # training
-    theta_new = train(x_train, y_train, theta, model, lr=1e-4, steps=1000)
+    theta_new = train(x_train, y_train, theta, model, lr=1e-4, steps=2000)
     # plot boundary after training
     plot_boundary(theta_new, "lightblue")
     plt.show()
