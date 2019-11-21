@@ -37,9 +37,9 @@ def error_rate(_x, _y, _theta, _model):
     error_count = 0
     for i in range(len(_x)):
         if (_model(_x[i], _theta) > 0.5) and _y[i][0] == 0:
-            error_count += 1;
+            error_count += 1
         if (_model(_x[i], _theta) < 0.5) and _y[i][0] == 1:
-            error_count += 1;
+            error_count += 1
     return error_count / len(_x)
 
 
