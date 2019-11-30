@@ -42,9 +42,9 @@ def error_rate(_x, _y, _theta, _model):
 def gradient(_x, _y, _theta, _model):
     grad = np.array([0., 0., 0.])
     for i in range(len(_x)):
-        grad[0] += (-(1. - model(_x[i], _theta)) * _y[i][0] + model(_x[i], _theta) * _y[i][1]) * _x[i][0]
-        grad[1] += (-(1. - model(_x[i], _theta)) * _y[i][0] + model(_x[i], _theta) * _y[i][1]) * _x[i][1]
-        grad[2] += (-(1. - model(_x[i], _theta)) * _y[i][0] + model(_x[i], _theta) * _y[i][1])
+        grad[0] += (-(1. - _model(_x[i], _theta)) * _y[i][0] + _model(_x[i], _theta) * _y[i][1]) * _x[i][0]
+        grad[1] += (-(1. - _model(_x[i], _theta)) * _y[i][0] + _model(_x[i], _theta) * _y[i][1]) * _x[i][1]
+        grad[2] += (-(1. - _model(_x[i], _theta)) * _y[i][0] + _model(_x[i], _theta) * _y[i][1])
     return grad
 
 

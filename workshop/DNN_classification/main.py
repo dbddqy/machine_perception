@@ -73,14 +73,14 @@ def plot_boundary(_dnn, _color):
 if __name__ == "__main__":
     x_train, y_train, x_test, y_test = generate_data(100)
     dnn = NeuralNetwork(2)
-    for _ in range(3):
-        dnn.add_dense_layer(5, activation=relu, d_activation=d_relu)
+    for _ in range(2):
+        dnn.add_dense_layer(50, activation=relu, d_activation=d_relu)
     dnn.add_dense_layer(2, activation=softmax, d_activation=d_softmax)
     # plot boundary before training
     plot_boundary(dnn, "orange")
     # training
     # print(dnn.model(x_train[6:7].T)[-1])
-    train(x_train, y_train, dnn, lr=1e-3, steps=10000)
+    train(x_train, y_train, dnn, lr=1e-2, steps=1000)
     # plot boundary after training
     plot_boundary(dnn, "lightblue")
     plt.show()
