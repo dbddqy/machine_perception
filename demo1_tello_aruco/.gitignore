@@ -1,5 +1,5 @@
-demo1_tello_aruco/cv_aruco/__pycache__/
-demo1_tello_aruco/cv_aruco/.idea/
+__pycache__/
+.idea/
 *.3dmbak
 
 # Byte-compiled / optimized / DLL files
