@@ -1,0 +1,42 @@
+Left
+
+Calibration results after optimization (with uncertainties):
+
+Focal Length:          fc = [ 890.77500   892.32125 ] +/- [ 6.37063   6.31204 ]
+Principal point:       cc = [ 320.20940   230.82227 ] +/- [ 9.39692   7.55063 ]
+Skew:             alpha_c = [ 0.00000 ] +/- [ 0.00000  ]   => angle of pixel axes = 90.00000 +/- 0.00000 degrees
+Distortion:            kc = [ -0.42207   0.10545   -0.00048   0.00198  0.00000 ] +/- [ 0.02002   0.19498   0.00150   0.00151  0.00000 ]
+Pixel error:          err = [ 0.09601   0.08276 ]
+
+Right
+
+Calibration results after optimization (with uncertainties):
+
+Focal Length:          fc = [ 883.20995   882.70531 ] +/- [ 6.59031   6.49441 ]
+Principal point:       cc = [ 322.14453   234.03991 ] +/- [ 9.12428   6.97485 ]
+Skew:             alpha_c = [ 0.00000 ] +/- [ 0.00000  ]   => angle of pixel axes = 90.00000 +/- 0.00000 degrees
+Distortion:            kc = [ -0.44452   0.28315   -0.00459   -0.00114  0.00000 ] +/- [ 0.02504   0.27050   0.00163   0.00170  0.00000 ]
+Pixel error:          err = [ 0.09356   0.08122 ]
+
+
+
+Intrinsic parameters of left camera:
+
+Focal Length:          fc_left = [ 891.99940   892.35459 ]  [ 4.67751   4.63799 ]
+Principal point:       cc_left = [ 326.93216   235.09397 ]  [ 7.53746   5.54051 ]
+Skew:             alpha_c_left = [ 0.00000 ]  [ 0.00000  ]   => angle of pixel axes = 90.00000  0.00000 degrees
+Distortion:            kc_left = [ -0.43721   0.24738   -0.00196   0.00004  0.00000 ]  [ 0.01986   0.22133   0.00121   0.00122  0.00000 ]
+
+
+Intrinsic parameters of right camera:
+
+Focal Length:          fc_right = [ 886.52934   886.13278 ]  [ 4.75739   4.72390 ]
+Principal point:       cc_right = [ 318.26183   238.68409 ]  [ 7.16349   5.57749 ]
+Skew:             alpha_c_right = [ 0.00000 ]  [ 0.00000  ]   => angle of pixel axes = 90.00000  0.00000 degrees
+Distortion:            kc_right = [ -0.41575   0.07315   -0.00450   -0.00067  0.00000 ]  [ 0.02507   0.30351   0.00118   0.00121  0.00000 ]
+
+
+Extrinsic parameters (position of right camera wrt left camera):
+
+Rotation vector:             om = [ -0.00271   -0.01687  0.00032 ]  [ 0.00444   0.00584  0.00023 ]
+Translation vector:           T = [ -60.27202   0.36238  -0.39229 ]  [ 0.15362   0.16134  1.37939 ]
