@@ -2,20 +2,9 @@
 // Created by yue on 04.12.19.
 //
 
-#include <iostream>
-#include <opencv2/opencv.hpp>
+#include <CameraConfig.hpp>
 
-using namespace cv;
-
-class CameraConfig {
-public:
-    Mat leftCameraMatrix, leftDistortion, rightCameraMatrix, rightDistortion;
-    Mat RVec, R, T;
-    Size size;
-    Mat R1, R2, P1, P2, Q, mapL1, mapL2, mapR1, mapR2, cameraLInv, cameraRInv;
-    double b, f;
-
-    CameraConfig() {
+CameraConfig::CameraConfig() {
     leftCameraMatrix = (Mat_<double>(3, 3)
             << 891.99940, 0., 326.93216
             , 0., 892.35459, 235.09397
@@ -40,25 +29,22 @@ public:
     f = P1.at<double>(0, 0);
     cameraLInv = P1(Rect(0, 0, 3, 3)).inv();
     cameraRInv = P2(Rect(0, 0, 3, 3)).inv();
-    }
+}
 
-    Mat getR() {
-        Mat mat;
-        Rodrigues(RVec, mat);
-        return mat;
-    }
+Mat CameraConfig::getR() {
+    Mat mat;
+    Rodrigues(RVec, mat);
+    return mat;
+}
 
-    void getCameraMatrices(Mat &outR1, Mat &outR2, Mat &outP1, Mat &outP2, Mat &outQ) {
-        stereoRectify(leftCameraMatrix, leftDistortion, rightCameraMatrix, rightDistortion
-        , size, R, T, outR1, outR2, outP1, outP2, outQ);
-    }
+void CameraConfig::getCameraMatrices(Mat &outR1, Mat &outR2, Mat &outP1, Mat &outP2, Mat &outQ) {
+    stereoRectify(leftCameraMatrix, leftDistortion, rightCameraMatrix, rightDistortion
+                , size, R, T, outR1, outR2, outP1, outP2, outQ);
+}
 
-    void getMaps(Mat &outMapL1, Mat &outMapL2, Mat &outMapR1, Mat &outMapR2) {
-        Mat R1, R2, P1, P2, Q;
-        getCameraMatrices(R1, R2, P1, P2, Q);
-        initUndistortRectifyMap(leftCameraMatrix, leftDistortion, R1, P1, size, CV_32FC1, outMapL1, outMapL2);
-        initUndistortRectifyMap(rightCameraMatrix, rightDistortion, R2, P2, size, CV_32FC1, outMapR1, outMapR2);
-    }
-};
-
-CameraConfig c;
+void CameraConfig::getMaps(Mat &outMapL1, Mat &outMapL2, Mat &outMapR1, Mat &outMapR2) {
+    Mat R1, R2, P1, P2, Q;
+    getCameraMatrices(R1, R2, P1, P2, Q);
+    initUndistortRectifyMap(leftCameraMatrix, leftDistortion, R1, P1, size, CV_32FC1, outMapL1, outMapL2);
+    initUndistortRectifyMap(rightCameraMatrix, rightDistortion, R2, P2, size, CV_32FC1, outMapR1, outMapR2);
+}

@@ -1,7 +1,7 @@
-add_library(libdetection SHARED detection.cpp)
-add_library(libmatching SHARED matching.cpp)
-add_library(libcameraConfig SHARED CameraConfig.cpp)
-add_library(libPose SHARED Pose.cpp)
+add_library(libdetection SHARED detection.cpp detection.hpp)
+add_library(libmatching SHARED matching.cpp matching.hpp)
+add_library(libcameraConfig SHARED CameraConfig.cpp CameraConfig.hpp)
+add_library(libPose SHARED Pose.cpp Pose.hpp)
 
 target_include_directories(libdetection PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(libmatching PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

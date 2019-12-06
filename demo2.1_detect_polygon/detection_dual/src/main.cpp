@@ -1,14 +1,14 @@
-#include <iostream>
-#include "main.h"
-#include <opencv2/opencv.hpp>
-#include <detection.cpp>
-#include <matching.cpp>
-
-using namespace cv;
-using namespace std;
+#include "main.hpp"
 
 int main() {
     VideoCapture inputVideo("../../data/02.mov");
+//    Point3d a(1., 0., 0.), b(0, 1, 0), c(-1, -3, 0);
+//    vector<Point3d> polyline;
+//    polyline.push_back(a);
+//    polyline.push_back(b);
+//    polyline.push_back(c);
+//    Vec3d v(1, 2, 3);
+//    cout << v[-1];
     // load camera parameters
     while (true) {
         Mat img;
@@ -28,8 +28,10 @@ int main() {
         // matching
         vector< vector<Point3d> > polylines;
         if (validate(contoursL, contoursR, polylines))
-            for (auto polyline : polylines)
-                cout << polyline << endl;
+            for (auto polyline : polylines) {
+                cout << "from pose" << getPose(polyline).t() << endl;
+                cout << "from center" << getCenter(polyline) << endl;
+            }
         // show images
         imshow("rawL", imgL);
         imshow("rawR", imgR);

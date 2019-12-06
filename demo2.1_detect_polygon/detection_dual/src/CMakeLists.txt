@@ -1,4 +1,4 @@
-add_executable(main main.cpp)
+add_executable(main main.cpp main.hpp)
 
 target_link_libraries(main PRIVATE libdetection)
 target_link_libraries(main PRIVATE libmatching)

@@ -2,16 +2,9 @@
 // Created by yue on 04.12.19.
 //
 
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <CameraConfig.cpp>
-#include <Pose.cpp>
-#include <math.h>
+#include <matching.hpp>
 
-using namespace std;
-using namespace cv;
-
-bool validate(vector< vector<Point> > contoursL, vector< vector<Point> > contoursR, vector< vector<Point3d> > &realPolylines) {
+bool validate(vector<vector<Point> > contoursL, vector<vector<Point> > contoursR, vector<vector<Point3d> > &realPolylines) {
     if (contoursL.size() != contoursR.size()) return false;
 
     for (int i = 0; i < contoursL.size(); ++i) {
@@ -46,19 +39,42 @@ bool validate(vector< vector<Point> > contoursL, vector< vector<Point> > contour
 Point3d getCenter(vector<Point3d> polyline) {
     Point3d center(0., 0., 0.);
     for (auto p : polyline) center += p;
+    center.x /= polyline.size();
+    center.y /= polyline.size();
+    center.z /= polyline.size();
     return center;
 }
 
 Vec3d getNormal(vector<Point3d> polyline) {
     Point3d center = getCenter(polyline);
-    Vec3d v0 = polyline[0];
-    Vec3d v1 = polyline[1];
-    return v0.cross(v1);
+    Vec3d v0 = polyline[0] - center;
+    Vec3d v1 = polyline[1] - center;
+    return unitize(v0.cross(v1));
 }
 
 Pose getPose(vector<Point3d> polyline) {
+    Vec3d zAxis = unitize(getNormal(polyline));
+    double maxDis = 0.0;
+    Vec3d xAxis; // choose farthest vec as x-axis
     Point3d center = getCenter(polyline);
     for (auto p : polyline) {
         Vec3d vt = p - center;
+        if (getLength(vt) > maxDis) {
+            maxDis = getLength(vt);
+            xAxis = vt;
+        }
     }
+    Pose pose(center, xAxis, zAxis);
+    return pose;
 }
+
+Vec3d unitize(Vec3d v) {
+    Vec3d unitVec;
+    normalize(v, unitVec, 1, 0, NORM_L2);
+    return unitVec;
+}
+
+double getLength(Vec3d v) {
+    return sqrt(v.dot(v));
+}
+

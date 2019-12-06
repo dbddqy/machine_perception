@@ -2,12 +2,7 @@
 // Created by yue on 03.12.19.
 //
 
-#include <iostream>
-#include <vector>
-#include <opencv2/opencv.hpp>
-
-using namespace std;
-using namespace cv;
+#include <detection.hpp>
 
 vector<Point> findLargestContour(vector< vector<Point> > contours) {
     double largestArea = 0.; int largestIndex = 0;
