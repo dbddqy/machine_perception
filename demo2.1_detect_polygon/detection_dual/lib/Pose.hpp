@@ -15,7 +15,10 @@ public:
     Pose(Point3d origin, Vec3d rotationVec);
     Pose(Point3d origin, Vec3d unitZ, Vec3d unitX);
     Mat R();
-    Mat t();
+    Mat origin();
+    Mat xAxis();
+    Mat yAxis();
+    Mat zAxis();
 };
 
 #endif //POSE_HPP

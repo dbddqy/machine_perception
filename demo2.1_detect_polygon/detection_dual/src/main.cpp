@@ -8,7 +8,12 @@ int main() {
 //    polyline.push_back(b);
 //    polyline.push_back(c);
 //    Vec3d v(1, 2, 3);
-//    cout << v[-1];
+//    Mat leftCameraMatrix = (Mat_<double>(3, 3)
+//            << 891.99940, 0., 326.93216
+//            , 0., 892.35459, 235.09397
+//            , 0., 0., 1.);
+//
+//    cout << leftCameraMatrix(Rect(2, 0, 1, 3));
     // load camera parameters
     while (true) {
         Mat img;
@@ -29,14 +34,15 @@ int main() {
         vector< vector<Point3d> > polylines;
         if (validate(contoursL, contoursR, polylines))
             for (auto polyline : polylines) {
-                cout << "from pose" << getPose(polyline).t() << endl;
-                cout << "from center" << getCenter(polyline) << endl;
+                Pose pose = getPose(polyline);
+                cout << "from pose" << pose.origin().t() << endl;
+                imgL = drawPose(imgL, pose, 15);
             }
         // show images
         imshow("rawL", imgL);
         imshow("rawR", imgR);
 
-        char key = (char) waitKey(1);
+        char key = (char) waitKey(5);
         if (key == 27)
             break;
     }

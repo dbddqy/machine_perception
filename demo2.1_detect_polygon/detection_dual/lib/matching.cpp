@@ -64,8 +64,28 @@ Pose getPose(vector<Point3d> polyline) {
             xAxis = vt;
         }
     }
-    Pose pose(center, xAxis, zAxis);
+    Pose pose(center, unitize(xAxis), zAxis);
     return pose;
+}
+
+Mat drawPose(Mat img, Pose pose, double length) {
+    Mat originReal = pose.origin();
+    Mat xReal = pose.origin() + pose.xAxis() * length;
+    Mat yReal = pose.origin() + pose.yAxis() * length;
+    Mat zReal = pose.origin() + pose.zAxis() * length;
+    Point originPix = vec2point((Mat)(c.cameraL*originReal));
+    Point xPix = vec2point((Mat)(c.cameraL*xReal));
+    Point yPix = vec2point((Mat)(c.cameraL*yReal));
+    Point zPix = vec2point((Mat)(c.cameraL*zReal));
+    line(img, originPix, xPix, Scalar(0, 0, 255), 2);
+    line(img, originPix, yPix, Scalar(0, 255, 0), 2);
+    line(img, originPix, zPix, Scalar(255, 0, 0), 2);
+    return img;
+}
+
+Point vec2point(Mat v) {
+    Point p(v.at<double>(0, 0)/v.at<double>(2, 0), v.at<double>(1, 0)/v.at<double>(2, 0));
+    return p;
 }
 
 Vec3d unitize(Vec3d v) {

@@ -15,7 +15,8 @@ public:
     Mat leftCameraMatrix, leftDistortion, rightCameraMatrix, rightDistortion;
     Mat RVec, R, T;
     Size size;
-    Mat R1, R2, P1, P2, Q, mapL1, mapL2, mapR1, mapR2, cameraLInv, cameraRInv;
+    Mat R1, R2, P1, P2, Q, mapL1, mapL2, mapR1, mapR2;
+    Mat cameraL, cameraR, cameraLInv, cameraRInv;
     double b, f;
 
     CameraConfig();

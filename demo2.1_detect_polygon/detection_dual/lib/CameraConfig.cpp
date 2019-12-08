@@ -27,8 +27,10 @@ CameraConfig::CameraConfig() {
     getMaps(mapL1, mapL2, mapR1, mapR2);
     b = -T.at<double>(0, 0);
     f = P1.at<double>(0, 0);
-    cameraLInv = P1(Rect(0, 0, 3, 3)).inv();
-    cameraRInv = P2(Rect(0, 0, 3, 3)).inv();
+    cameraL = P1(Rect(0, 0, 3, 3));
+    cameraR = P2(Rect(0, 0, 3, 3));
+    cameraLInv = cameraL.inv();
+    cameraRInv = cameraR.inv();
 }
 
 Mat CameraConfig::getR() {

@@ -23,6 +23,10 @@ Vec3d getNormal(vector<Point3d> polyline);
 
 Pose getPose(vector<Point3d> polyline);
 
+Mat drawPose(Mat img, Pose pose, double length); // length in mm
+
+Point vec2point(Mat v);
+
 Vec3d unitize(Vec3d v);
 
 double getLength(Vec3d v);
