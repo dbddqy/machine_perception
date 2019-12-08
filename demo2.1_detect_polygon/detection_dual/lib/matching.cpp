@@ -4,6 +4,30 @@
 
 #include <matching.hpp>
 
+vector< vector<Vec3d> > getLibPieces() {
+    // read whole json file
+    string json;
+    readFileToString("../../hardware/library.json", json);
+    // convert to library of pieces
+    vector< vector<Vec3d> > libPieces;
+    Document document;
+    document.Parse(json.c_str());
+//    assert(document.IsArray());
+//    assert(document[0].IsObject());
+//    assert(document[0].HasMember("index"));
+//    assert(document[0]["index"].IsInt());
+    for (int i = 0; i < document.Size(); ++i) {
+        vector<Vec3d> pieceToAppend;
+        for (int j = 0; j < document[i]["vertices"].Size(); ++j)
+            pieceToAppend.push_back(Vec3d(
+                    document[i]["vertices"][j][0].GetDouble(),
+                    document[i]["vertices"][j][1].GetDouble(),
+                    document[i]["vertices"][j][2].GetDouble()));
+        libPieces.push_back(pieceToAppend);
+    }
+    return libPieces;
+}
+
 bool validate(vector<vector<Point> > contoursL, vector<vector<Point> > contoursR, vector<vector<Point3d> > &realPolylines) {
     if (contoursL.size() != contoursR.size()) return false;
 
@@ -34,6 +58,10 @@ bool validate(vector<vector<Point> > contoursL, vector<vector<Point> > contoursR
     }
 
     return true;
+}
+
+int match(vector<Point3d> polyline) {
+    return -1;
 }
 
 Point3d getCenter(vector<Point3d> polyline) {
@@ -98,3 +126,37 @@ double getLength(Vec3d v) {
     return sqrt(v.dot(v));
 }
 
+bool readFileToString(string file_name, string& fileData) {
+    ifstream file(file_name.c_str(),  std::ifstream::binary);
+    if(file)
+    {
+        // Calculate the file's size, and allocate a buffer of that size.
+        file.seekg(0, file.end);
+        const int file_size = file.tellg();
+        char* file_buf = new char [file_size+1];
+        //make sure the end tag \0 of string.
+        memset(file_buf, 0, file_size+1);
+
+        // Read the entire file into the buffer.
+        file.seekg(0, ios::beg);
+        file.read(file_buf, file_size);
+
+        if(file)
+        {
+            fileData.append(file_buf);
+        }
+        else
+        {
+            std::cout << "error: only " <<  file.gcount() << " could be read";
+            fileData.append(file_buf);
+            return false;
+        }
+        file.close();
+        delete []file_buf;
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
