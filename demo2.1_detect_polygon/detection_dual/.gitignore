@@ -1,3 +1,6 @@
+*.3dmbak
+*.stlbak
+
 cmake-build-debug/
 hide/
 .idea/
