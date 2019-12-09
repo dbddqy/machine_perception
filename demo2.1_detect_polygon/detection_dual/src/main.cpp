@@ -16,6 +16,12 @@ int main() {
         // left
         vector< vector<Point> > contoursL = getContours(imgL);
         drawContours(imgL, contoursL, -1, Scalar(0, 0, 255));
+//        // log point order
+//        for (auto c : contoursL)
+//            for (int i = 0; i < c.size(); ++i) {
+//                putText(imgL, to_string(i), c[i], FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2);
+//            }
+
         // right
         vector< vector<Point> > contoursR = getContours(imgR);
         drawContours(imgR, contoursR, -1, Scalar(0, 0, 255));
@@ -25,14 +31,16 @@ int main() {
             for (auto polyline : polylines) {
                 Pose pose = getPose(polyline);
                 int index = match(polyline, pose);
-                cout << "from pose" << pose.origin().t() << " index:" << index << endl;
-                imgL = drawPose(imgL, pose, 15);
+//                cout << "from pose" << pose.origin().t() << " index:" << index << endl;
+                if (index != -1) {
+                    imgL = drawPose(imgL, pose, index, 15);
+                }
             }
         // show images
         imshow("rawL", imgL);
         imshow("rawR", imgR);
 
-        char key = (char) waitKey(1);
+        char key = (char) waitKey();
         if (key == 27)
             break;
     }

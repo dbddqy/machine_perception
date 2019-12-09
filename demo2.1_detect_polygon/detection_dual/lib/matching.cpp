@@ -74,9 +74,11 @@ int match(vector<Point3d> polyline, Pose pose) {
         // count doesn't match continue
         if (polylineTransformed.size() != libPiece.size()) continue;
 
+        cout << "measured: ";
         for (auto p : polylineTransformed) // log for debug
             cout << p;
         cout << endl;
+        cout << "lib: ";
         for (auto p : libPiece)
             cout << p;
         cout << endl; // log for debug
@@ -86,7 +88,8 @@ int match(vector<Point3d> polyline, Pose pose) {
         for (int j = 0; j < libPiece.size(); ++j) {
             cost += distance(polylineTransformed[j], libPiece[j]);
         }
-        if (cost < 10.0) return i;
+        if (cost < 20.0) return i;
+        cout << cost << endl;
     }
     return -1;
 }
@@ -109,22 +112,13 @@ Vec3d getNormal(vector<Point3d> polyline) {
 
 Pose getPose(vector<Point3d> polyline) {
     Vec3d zAxis = unitize(getNormal(polyline));
-    double maxDis = 0.0;
     Point3d center = getCenter(polyline);
     Vec3d xAxis = polyline[0] - center; // polyline already sorted
-//    Vec3d xAxis; // choose farthest vec as x-axis
-//    for (auto p : polyline) {
-//        Vec3d vt = p - center;
-//        if (getLength(vt) > maxDis) {
-//            maxDis = getLength(vt);
-//            xAxis = vt;
-//        }
-//    }
     Pose pose(center, unitize(xAxis), zAxis);
     return pose;
 }
 
-Mat drawPose(Mat img, Pose pose, double length) {
+Mat drawPose(Mat img, Pose pose, int index, double length) {
     Mat originReal = pose.origin();
     Mat xReal = pose.origin() + pose.xAxis() * length;
     Mat yReal = pose.origin() + pose.yAxis() * length;
@@ -136,19 +130,20 @@ Mat drawPose(Mat img, Pose pose, double length) {
     line(img, originPix, xPix, Scalar(0, 0, 255), 2);
     line(img, originPix, yPix, Scalar(0, 255, 0), 2);
     line(img, originPix, zPix, Scalar(255, 0, 0), 2);
+    putText(img, to_string(index), Point(originPix.x, originPix.y+10), FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2);
     return img;
 }
 
 void sortPolyline(vector<Point3d> &polyline) {
     vector<Point3d> newPolyline;
     Point3d center = getCenter(polyline);
-    int maxIndex = 0;
+    int minIndex = 0;
     for (int i = 0; i < polyline.size(); ++i) {
         double disTemp = distance(center, polyline[i]);
-        if (disTemp > distance(center, polyline[maxIndex])) maxIndex = i;
+        if (disTemp < distance(center, polyline[minIndex])) minIndex = i;
     }
     for (int i = 0; i < polyline.size(); ++i) {
-        newPolyline.push_back(polyline[(maxIndex+i)%polyline.size()]);
+        newPolyline.push_back(polyline[(minIndex+i)%polyline.size()]);
     }
     polyline = newPolyline;
 }
