@@ -54,7 +54,6 @@ bool validate(vector<vector<Point> > contoursL, vector<vector<Point> > contoursR
         }
 //        cout << "contour left: " << contoursL[i] << endl;
 //        cout << "contour right: " << contoursR[i] << endl;
-        sortPolyline(polylineToAppend);
         realPolylines.push_back(polylineToAppend);
     }
     return true;
@@ -113,8 +112,13 @@ Vec3d getNormal(vector<Point3d> polyline) {
 Pose getPose(vector<Point3d> polyline) {
     Vec3d zAxis = unitize(getNormal(polyline));
     Point3d center = getCenter(polyline);
-    Vec3d xAxis = polyline[0] - center; // polyline already sorted
-    Pose pose(center, unitize(xAxis), zAxis);
+    // choose for closest vec for xAxis
+    int closestIndex = 0;
+    for (int i = 0; i < polyline.size(); ++i) {
+        if (distance(polyline[i], center) < distance(polyline[closestIndex], center))
+            closestIndex = i;
+    }
+    Pose pose(center, unitize(polyline[closestIndex]-center), zAxis);
     return pose;
 }
 
@@ -135,6 +139,18 @@ Mat drawPose(Mat img, Pose pose, int index, double length) {
 }
 
 void sortPolyline(vector<Point3d> &polyline) {
+    // bubble method
+//    Point3d center = getCenter(polyline);
+//    for (int i = 0; i < polyline.size() - 1; ++i) {
+//        for (int j = 0; j < polyline.size() - i - 1; j++) {
+//            if (distance(center, polyline[j]) > distance(center, polyline[j+1])) {
+//                Point3d temp = polyline[j];
+//                polyline[j] = polyline[j + 1];
+//                polyline[j + 1] = temp;
+//            }
+//        }
+//    }
+    // sort in order
     vector<Point3d> newPolyline;
     Point3d center = getCenter(polyline);
     int minIndex = 0;
