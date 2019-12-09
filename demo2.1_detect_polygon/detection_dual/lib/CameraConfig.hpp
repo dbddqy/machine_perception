@@ -28,6 +28,6 @@ public:
     void getMaps(Mat &outMapL1, Mat &outMapL2, Mat &outMapR1, Mat &outMapR2);
 };
 
-CameraConfig c;
+CameraConfig C;
 
 #endif //CAMERA_CONFIG_H
