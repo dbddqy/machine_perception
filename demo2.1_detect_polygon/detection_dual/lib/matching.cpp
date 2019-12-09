@@ -65,32 +65,33 @@ int match(vector<Point3d> polyline, Pose pose) {
     for (int i = 0; i < polyline.size(); ++i) {
         polylineTransformed.push_back(transformCamera2Piece(polyline[i], pose));
     }
+    double minCost = 20.; int minIndex = -1;
     for (int i = 0; i < LIBPIECES.size(); ++i) {
-//        for (int shift = 0; shift < polyline.size(); ++shift) {
-//            return 0;
-//        }
         vector<Point3d> libPiece = LIBPIECES[i];
         // count doesn't match continue
         if (polylineTransformed.size() != libPiece.size()) continue;
 
-        cout << "measured: ";
-        for (auto p : polylineTransformed) // log for debug
-            cout << p;
-        cout << endl;
-        cout << "lib: ";
-        for (auto p : libPiece)
-            cout << p;
-        cout << endl; // log for debug
+//        cout << "measured: ";
+//        for (auto p : polylineTransformed) // log for debug
+//            cout << p;
+//        cout << endl;
+//        cout << "lib: ";
+//        for (auto p : libPiece)
+//            cout << p;
+//        cout << endl; // log for debug
 
         // cost = sum of all the distance
         double cost = 0.;
         for (int j = 0; j < libPiece.size(); ++j) {
             cost += distance(polylineTransformed[j], libPiece[j]);
         }
-        if (cost < 20.0) return i;
-        cout << cost << endl;
+        if (cost > 20.0) continue;
+        if (cost < minCost) {
+            minCost = cost;
+            minIndex = i;
+        }
     }
-    return -1;
+    return minIndex;
 }
 
 Point3d getCenter(vector<Point3d> polyline) {
@@ -134,7 +135,7 @@ Mat drawPose(Mat img, Pose pose, int index, double length) {
     line(img, originPix, xPix, Scalar(0, 0, 255), 2);
     line(img, originPix, yPix, Scalar(0, 255, 0), 2);
     line(img, originPix, zPix, Scalar(255, 0, 0), 2);
-    putText(img, to_string(index), Point(originPix.x, originPix.y+10), FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2);
+    putText(img, "index:"+to_string(index), Point(originPix.x, originPix.y+40), FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2);
     return img;
 }
 
@@ -203,18 +204,13 @@ bool readFileToString(string file_name, string& fileData) {
         char* file_buf = new char [file_size+1];
         //make sure the end tag \0 of string.
         memset(file_buf, 0, file_size+1);
-
         // Read the entire file into the buffer.
         file.seekg(0, ios::beg);
         file.read(file_buf, file_size);
-
         if(file)
-        {
             fileData.append(file_buf);
-        }
-        else
-        {
-            std::cout << "error: only " <<  file.gcount() << " could be read";
+        else {
+            std::cout << "error: only " << file.gcount() << " could be read";
             fileData.append(file_buf);
             return false;
         }
@@ -222,8 +218,6 @@ bool readFileToString(string file_name, string& fileData) {
         delete []file_buf;
     }
     else
-    {
         return false;
-    }
     return true;
 }

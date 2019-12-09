@@ -1,10 +1,13 @@
 #include "main.hpp"
 
+int ITERATION_COUNT = 0;
+
 int main() {
     VideoCapture inputVideo("../../data/02.mov");
 
     // load camera parameters
     while (true) {
+        if(ITERATION_COUNT == 301) break;
         Mat img;
         inputVideo >> img;
         if (img.empty()) break;
@@ -24,21 +27,25 @@ int main() {
         vector< vector<Point3d> > polylines;
         if (validate(contoursL, contoursR, polylines))
             for (auto polyline : polylines) {
-                Pose pose = getPose(polyline);
                 sortPolyline(polyline);
+                Pose pose = getPose(polyline);
                 int index = match(polyline, pose);
-//                cout << "from pose" << pose.origin().t() << " index:" << index << endl;
                 if (index != -1) {
                     imgL = drawPose(imgL, pose, index, 15);
+                    cout << "piece found: " << pose.origin().t() << " index:" << index << endl;
                 }
             }
         // show images
         imshow("rawL", imgL);
         imshow("rawR", imgR);
+//        imwrite("rawL.png", imgL);
+//        imwrite("rawR.png", imgR);
 
         char key = (char) waitKey(1);
         if (key == 27)
             break;
+        ITERATION_COUNT += 1;
+        cout << ITERATION_COUNT << endl;
     }
     return 0;
 }
