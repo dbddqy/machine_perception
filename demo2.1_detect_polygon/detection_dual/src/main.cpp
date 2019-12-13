@@ -4,10 +4,16 @@ int ITERATION_COUNT = 0;
 
 int main() {
     VideoCapture inputVideo("../../data/02.mov");
-
+//    VideoWriter writer;
+//    writer.open("result.avi", CV_FOURCC('M', 'J', 'P', 'G'), 36, Size(1280, 480), true);
     // load camera parameters
+
+    struct timespec tpstart;
+    struct timespec tpend;
+    clock_gettime(CLOCK_MONOTONIC, &tpstart);
+
     while (true) {
-        if(ITERATION_COUNT == 301) break;
+//        if(ITERATION_COUNT == 301) break;
         Mat img;
         inputVideo >> img;
         if (img.empty()) break;
@@ -36,16 +42,24 @@ int main() {
                 }
             }
         // show images
-        imshow("rawL", imgL);
-        imshow("rawR", imgR);
+//        imshow("rawL", imgL);
+//        imshow("rawR", imgR);
 //        imwrite("rawL.png", imgL);
 //        imwrite("rawR.png", imgR);
+//        Mat output(480, 1280, img.type());
+//        imgL.copyTo(output(Rect(0, 0, 640, 480)));
+//        imgR.copyTo(output(Rect(640, 0, 640, 480)));
+//        imshow("output", output);
+//        writer.write(output);
 
-        char key = (char) waitKey(1);
-        if (key == 27)
-            break;
+//        char key = (char) waitKey(1);
+//        if (key == 27)
+//            break;
         ITERATION_COUNT += 1;
         cout << ITERATION_COUNT << endl;
     }
+    clock_gettime(CLOCK_MONOTONIC, &tpend);
+    long timedif = 1000000*(tpend.tv_sec-tpstart.tv_sec)+(tpend.tv_nsec-tpstart.tv_nsec)/1000;
+    fprintf(stdout, "it took %ld microseconds\n", timedif);
     return 0;
 }

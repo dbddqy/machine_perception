@@ -37,15 +37,14 @@ vector< vector<Point> > getContours(Mat img) {
      *  7.contour to polyline(corners get!) */
     Mat imgGrey, imgBlur, imgFilter2d, imgBlur2, imgBin;
     // 1.convert to greyscale and blurring
-    imshow("0", img);
+//    imshow("0", img);
 //    imwrite("0.png", img);
     cvtColor(img, imgGrey, CV_BGR2GRAY);
-    imshow("1", imgGrey);
+//    imshow("1", imgGrey);
 //    imwrite("1.png", imgGrey);
     GaussianBlur(imgGrey, imgBlur, Size(9, 9), 2);
-    imshow("2", imgBlur);
+//    imshow("2", imgBlur);
 //    imwrite("2.png", imgBlur);
-//    blur(imgGrey, imgBlur, Size(7, 7));
 
     // 2.edge extraction
 //    Mat kernel = (Mat_<char>(3, 3) << 0, 1, 0, 1, -4, 1, 0, 1, 0); // Laplacian filter
@@ -53,27 +52,27 @@ vector< vector<Point> > getContours(Mat img) {
 //    Mat kernel = (Mat_<char>(3, 3) << -1, -2, -1, 0, 0, 0, 1, 2, 1); // Sobel filter x_dir
     filter2D(imgBlur, imgFilter2d, -1, kernel);
 
-    Mat m3 = imgFilter2d.clone(), m4;
-    normalize(m3, m3, 255, 0, NORM_MINMAX);
-    imshow("3", m3);
+//    Mat m3 = imgFilter2d.clone(), m4;
+//    normalize(m3, m3, 255, 0, NORM_MINMAX);
+//    imshow("3", m3);
 //    imwrite("3.png", m3);
-    blur(m3, m4, Size(9, 9));
-    imshow("4", m4);
+//    blur(m3, m4, Size(9, 9));
+//    imshow("4", m4);
 //    imwrite("4.png", m4);
     // 3.blurring
     blur(imgFilter2d, imgBlur2, Size(9, 9));
     // 4.binarizing
     threshold(imgBlur2, imgBin, 3, 50, THRESH_BINARY);
-    imshow("5", imgBin);
+//    imshow("5", imgBin);
 //    imwrite("5.png", imgBin);
     // 5.find contours
     vector<vector<Point> > contours;
     findContours(imgBin, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-    Mat m6 = imgBin.clone();
-    Mat m7 = imgBin.clone();
-    drawContours(m6, contours, -1, Scalar(255, 255, 255));
-    imshow("6", m6);
+//    Mat m6 = imgBin.clone();
+//    Mat m7 = imgBin.clone();
+//    drawContours(m6, contours, -1, Scalar(255, 255, 255));
+//    imshow("6", m6);
 //    imwrite("6.png", m6);
 
 //    cout << contours.size() << endl;
@@ -84,8 +83,8 @@ vector< vector<Point> > getContours(Mat img) {
     for (int i = 0; i < largeContours.size(); ++i)
         approxPolyDP(largeContours[i], largeContours[i], 13, true);
 
-    drawContours(m7, largeContours, -1, Scalar(255, 255, 255));
-    imshow("7", m7);
+//    drawContours(m7, largeContours, -1, Scalar(255, 255, 255));
+//    imshow("7", m7);
 //    imwrite("7.png", m7);
 
 //    for (int i = 0; i < largeContours.size(); ++i)
