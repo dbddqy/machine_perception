@@ -1,0 +1,9 @@
+model: model_1.pickle
+
+PCA dimension reduction 28*28 -> 50
+
+one vs rest SVMs
+training sample used: 2000 samples
+
+training error rate: 0.017500
+test error rate: 0.110000

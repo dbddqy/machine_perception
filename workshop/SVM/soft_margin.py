@@ -6,14 +6,14 @@ from matplotlib import pyplot as plt
 def generate_data(n, p=1.0):
     # p: percentage of data for training
 
-    x11 = np.random.multivariate_normal([4., 3.], [[4., 0.], [0., 1.]], int(0.5*n))
-    x12 = np.random.multivariate_normal([2., -2.], [[1., 0.], [0., 2.]], int(0.25*n))
-    x13 = np.random.multivariate_normal([7., -4.], [[1., 0.], [0., 1.]], int(0.25*n))
-    x1 = np.vstack((x11, x12, x13))
-    # x1 = np.random.multivariate_normal([4., 3.], [[.4, 0.], [0., .1]], n)  # simple case
+    # x11 = np.random.multivariate_normal([4., 3.], [[4., 0.], [0., 1.]], int(0.5*n))
+    # x12 = np.random.multivariate_normal([2., -2.], [[1., 0.], [0., 2.]], int(0.25*n))
+    # x13 = np.random.multivariate_normal([7., -4.], [[1., 0.], [0., 1.]], int(0.25*n))
+    # x1 = np.vstack((x11, x12, x13))
+    x1 = np.random.multivariate_normal([4., 3.], [[.4, 0.], [0., .1]], int(1.0*n))  # simple case
 
     plt.scatter(x1.T[0], x1.T[1], color="red")
-    x2 = np.random.multivariate_normal([6., 0.], [[1.5, .5], [.5, 1.5]], n)
+    x2 = np.random.multivariate_normal([6., 0.], [[1.5, .5], [.5, 1.5]], int(1.0*n))
     plt.scatter(x2.T[0], x2.T[1], color="blue")
     # combine data
     x = np.vstack((x1, x2))
@@ -62,6 +62,7 @@ def plot_boundary(_alpha, x, y, _w0, kernel, _gamma, _color):
             f[i][j] = _w0
             for index in range(_alpha.shape[0]):
                 f[i][j] += (_alpha[index][0] * y[index][0] * kernel(x[index], x_to_classify, _gamma))
+            print(f[i][j])
     plt.contour(x_plot, y_plot, f, 0, colors=_color)
 
 
@@ -69,9 +70,9 @@ if __name__ == "__main__":
     n = 60
     x_train, y_train, x_test, y_test = generate_data(n)
 
-    gamma = 50
+    gamma = 1
     kernel = kernel_RBF
-    C = 1
+    C = 10
     P_Mat = get_P_Mat(x_train, y_train, n * 2, kernel=kernel, _gamma=gamma)
 
     # optimizaton
@@ -95,9 +96,9 @@ if __name__ == "__main__":
         if abs(alpha[i][0]-C) > 0.001:
             SV.append(i)
         SO.append(i)
-    print(alpha[SV])
+    print(alpha[SV].shape)
     print("______")
-    print(alpha[SO])
+    print(alpha[SO].shape)
     # print(SV)
     # print(x_train[SV])
 
