@@ -59,17 +59,17 @@ def plot_boundary(_dnn, _color):
 x_train, y_train, x_test, y_test = generate_data(100)
 
 nn = TorchNN(2)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
-nn.add_dense_layer(5)
+nn.add_dense_layer(20)
+nn.add_dense_layer(20)
+nn.add_dense_layer(20)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
+# nn.add_dense_layer(5)
 nn.add_dense_layer(2, activation=softmax)
 
 # print(x_train[:, :5])
@@ -91,9 +91,9 @@ nn.add_dense_layer(2, activation=softmax)
 
 plot_boundary(nn, "orange")
 
-lr = 1e-5
+lr = 5e-4
 
-for step in range(1500):
+for step in range(15000):
     loss = -torch.trace(torch.log(nn.model(x_train)).T.mm(y_train)) / x_train.shape[1]
     loss.backward()
     for tensor in nn.Ws:

@@ -30,9 +30,9 @@ def generate_data(n, p=0.8):
 def error_rate(_x, _y, _dnn):
     error_count = 0
     for i in range(len(_x)):
-        if (_dnn.model(_x[i:i+1].T)[3][0][0] > 0.5) and _y[i][0] == 0:
+        if (_dnn.model(_x[i:i+1].T)[-1][0][0] > 0.5) and _y[i][0] == 0:
             error_count += 1
-        if (_dnn.model(_x[i:i+1].T)[3][0][0] < 0.5) and _y[i][0] == 1:
+        if (_dnn.model(_x[i:i+1].T)[-1][0][0] < 0.5) and _y[i][0] == 1:
             error_count += 1
     return error_count / len(_x)
 
@@ -46,13 +46,11 @@ def train(_x, _y, _dnn, lr=1e-5, steps=1000):
         grad_b_sum_square.append(np.zeros(_dnn.Bs[i].shape))
     for step in range(steps):
         grad_w, grad_b = _dnn.gradient(_x, _y, d_loss_f=d_cross_entropy)
-        # for i in range(len(_dnn.Ws)):
-
         for i in range(len(_dnn.Ws)):
             grad_w_sum_square[i] += grad_w[i] ** 2
             grad_b_sum_square[i] += grad_b[i] ** 2
-            _dnn.Ws[i] -= grad_w[i] / (np.sqrt(grad_w_sum_square[i])+1e-9) * lr
-            _dnn.Bs[i] -= grad_b[i] / (np.sqrt(grad_b_sum_square[i])+1e-9) * lr
+            _dnn.Ws[i] -= grad_w[i] * lr / (np.sqrt(grad_w_sum_square[i])+1e-9)
+            _dnn.Bs[i] -= grad_b[i] * lr / (np.sqrt(grad_b_sum_square[i])+1e-9)
         # print log
         if step % 100 == 0:
             print("step: %d, training error rate: %f, testing error rate: %f"
@@ -66,7 +64,7 @@ def plot_boundary(_dnn, _color):
     f = np.zeros(x_plot.shape)
     for i in range(x_plot.shape[0]):
         for j in range(x_plot.shape[1]):
-            f[i][j] = _dnn.model(np.array([[x_plot[i][j]], [y_plot[i][j]]]))[3][0][0] - 0.5
+            f[i][j] = _dnn.model(np.array([[x_plot[i][j]], [y_plot[i][j]]]))[-1][0][0] - 0.5
     plt.contour(x_plot, y_plot, f, 0, colors=_color)
 
 
@@ -74,13 +72,13 @@ if __name__ == "__main__":
     x_train, y_train, x_test, y_test = generate_data(100)
     dnn = NeuralNetwork(2)
     for _ in range(2):
-        dnn.add_dense_layer(50, activation=relu, d_activation=d_relu)
+        dnn.add_dense_layer(100, activation=sigmoid, d_activation=d_sigmoid)
     dnn.add_dense_layer(2, activation=softmax, d_activation=d_softmax)
     # plot boundary before training
     plot_boundary(dnn, "orange")
     # training
     # print(dnn.model(x_train[6:7].T)[-1])
-    train(x_train, y_train, dnn, lr=1e-2, steps=1000)
+    train(x_train, y_train, dnn, lr=5e-4, steps=1000)
     # plot boundary after training
     plot_boundary(dnn, "lightblue")
     plt.show()

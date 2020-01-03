@@ -10,7 +10,7 @@ class NeuralNetwork:
         self.dims = [dim_in]
 
     def add_dense_layer(self, n, activation=relu, d_activation=d_relu):
-        self.Ws.append(np.random.uniform(-1., 1., [n, self.dims[-1]]))
+        self.Ws.append(np.random.normal(0., 2./self.dims[-1], [n, self.dims[-1]]))
         self.Bs.append(np.zeros([n, 1]))
         self.activations.append(activation)
         self.d_activations.append(d_activation)
@@ -45,15 +45,23 @@ class NeuralNetwork:
                 # _x2_to_a2 = np.diag((x2 - x2 * x2).reshape([5, ]))
                 jacobi = jacobi.dot(self.Ws[index]).dot(self.d_activations[index-1](x[index-1]))  # (1, x)*(x, y)*(y, y)
                 index -= 1
+        for i in range(len(self.Ws)):
+            grad_w[i] /= len(xs)
+            grad_b[i] /= len(xs)
         return grad_w, grad_b
 
-
-# nn = NeuralNetwork(4)
+#
+# nn = NeuralNetwork(2)
 # nn.add_dense_layer(10)
-# nn.add_dense_layer(4)
-# #
-# # x = [np.array([[1]]), np.array([[2]]), np.array([[3]])]
-# # y = [np.array([[1]]), np.array([[2]]), np.array([[3]])]
+# nn.add_dense_layer(2)
+#
+# x = np.array([[1., 2.], [4., 5.]])
+# y = np.array([[4., 6.], [9., 8.]])
+#
+# w, b = nn.gradient(x, y, d_l2)
+# print(w)
+# print(b)
+
 # x = np.array([[1, 2, 3, 5], [6, 4, 5, 6]])
 # y = np.array([[3, 2, 1, 6], [6, 7, 5, 6]])
 # # x = np.array([[1], [4]])

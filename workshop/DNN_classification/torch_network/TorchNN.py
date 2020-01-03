@@ -15,9 +15,10 @@ class TorchNN:
         self.dims = [dim_in]
 
     def add_dense_layer(self, n, activation=F.relu):
-        stdv = 1. / (self.dims[-1] ** 0.5)
-        w = torch.empty(n, self.dims[-1]).uniform_(-stdv, stdv)
-        w.requires_grad = True
+        # stdv = 1. / (self.dims[-1] ** 0.5)
+        # w = torch.empty(n, self.dims[-1]).uniform_(-stdv, stdv)
+        # w.requires_grad = True
+        w = torch.normal(0., 2./self.dims[-1], [n, self.dims[-1]], requires_grad=True)
         self.Ws.append(w)
         self.Bs.append(torch.zeros(n, 1, requires_grad=True))
         self.activations.append(activation)

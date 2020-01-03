@@ -10,7 +10,7 @@ def d_relu(x):  # (x, 1)
 
 
 def sigmoid(x):  # (x, 1)
-    return 1. / (1. + np.exp(-x))
+    return np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
 
 
 def d_sigmoid(x):
@@ -26,7 +26,7 @@ def d_softmax(x):  # (x, 1)
 
 
 def l2(x, y):  # (x, 1) (x, 1)
-    return np.mean((x - y) ** 2)  # scalar
+    return np.sum((x - y) ** 2)  # scalar
 
 
 def d_l2(x, y):  # (x, 1)
