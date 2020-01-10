@@ -1,0 +1,7 @@
+*.3dmbak
+*.3dm.rhl
+*.stlbak
+
+.idea/
+hide/
+
