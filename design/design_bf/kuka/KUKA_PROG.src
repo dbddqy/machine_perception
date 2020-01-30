@@ -1,0 +1,36 @@
+DEF KUKA_PROG()
+
+;---Declarations---
+INT HANDLE, OFFSET
+REAL TIMEOUT
+DECL STATE_T SW_T, SR_T, SC_T
+DECL MODUS_T MR_T, MW_T
+
+;===Other Declartions===
+DECL AXIS HOME
+
+Robot_Pose = {E6AXIS: A1 0, A2 -90, A3 90, A4 0, A5 0, A6 0, E1 0, E2 0, E3 0, E4 0, E5 0, E6 0}
+Online = FALSE
+
+;---Initializations---
+$BASE = {FRAME: X 0, Y 0, Z 0, A 0, B 0, C 0} ;Set the base coordinate system
+;Problems!!!
+$TOOL = TOOL_DATA[1] ;Set the tool coordinate system 
+HOME = {AXIS: A1 0, A2 -90, A3 90, A4 0, A5 0, A6 0} ;Set home gesture
+BAS (#VEL_PTP, 20) ;Point-to-point movement velocity (m/s^2)
+
+;--- Main section ---
+PTP HOME
+
+REPEAT ;Keep running the program until it is turned off
+    ;get pose from kukavarproxy and go there
+    ;IF Online == TRUE THEN
+    ;    PTP Robot_Pose
+	;ELSE
+	;	PTP HOME
+    ;ENDIF
+	PTP Robot_Pose
+UNTIL (ONLINE == FALSE)
+PTP HOME
+
+END
