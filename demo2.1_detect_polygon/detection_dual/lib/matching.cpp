@@ -19,10 +19,10 @@ vector< vector<Point3d> > getLibPieces() {
     for (int i = 0; i < document.Size(); ++i) {
         vector<Point3d> pieceToAppend;
         for (int j = 0; j < document[i]["vertices"].Size(); ++j)
-            pieceToAppend.push_back(Point3d(
+            pieceToAppend.emplace_back(
                     document[i]["vertices"][j][0].GetDouble(),
                     document[i]["vertices"][j][1].GetDouble(),
-                    document[i]["vertices"][j][2].GetDouble()));
+                    document[i]["vertices"][j][2].GetDouble()); // emplace_back doesn't need to create the instance
         libPieces.push_back(pieceToAppend);
     }
     return libPieces;

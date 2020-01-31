@@ -18,10 +18,10 @@ vector<Point> findLargestContour(vector< vector<Point> > contours) {
 
 vector< vector<Point> > findLargeContours(vector< vector<Point> > contours, double minArea) {
     vector< vector<Point> > outPutContours;
-    for (int i = 0; i < contours.size(); ++i) {
-        double area = contourArea(contours[i]);
+    for (const auto & contour : contours) {
+        double area = contourArea(contour);
         if (area > minArea)
-            outPutContours.push_back(contours[i]);
+            outPutContours.push_back(contour);
     }
     return outPutContours;
 }
@@ -80,8 +80,8 @@ vector< vector<Point> > getContours(Mat img) {
     vector< vector<Point> > largeContours = findLargeContours(contours, 500.);
 //    cout << largeContours.size() << endl;
     // 7.contour to polyline(corners get!)
-    for (int i = 0; i < largeContours.size(); ++i)
-        approxPolyDP(largeContours[i], largeContours[i], 13, true);
+    for (auto & largeContour : largeContours)
+        approxPolyDP(largeContour, largeContour, 13, true);
 
 //    drawContours(m7, largeContours, -1, Scalar(255, 255, 255));
 //    imshow("7", m7);
