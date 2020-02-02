@@ -33,14 +33,14 @@ struct CYLINDER_FITTING_COST {
 
 int main(int argc, char **argv) {
 //    double ar = 1.0, br = 2.0, cr = 1.0;         // 真实参数值
-    double t1 = 0.0153556, t2 = 1.40497, t3 = 0.435398, t4 = 0.569347, t5 = -0.954623, t6 = -0.288601, t7 = 0.0735111;        // 估计参数值
+    double t1 = 0.019792, t2 = 0.0742702, t3 = 0.113163, t4 = 0.416911, t5 = -0.478734, t6 = 0.859715, t7 = 0.178054;        // 估计参数值
 
 //    double w_sigma = 1.0;                        // 噪声Sigma值
 //    double inv_sigma = 1.0 / w_sigma;
 
     pcl::PCDReader reader;
     pcl::PointCloud<PointG>::Ptr cloud (new pcl::PointCloud<PointG>);
-    reader.read ("../../data/point_cloud/cloud_cylinder.pcd", *cloud);
+    reader.read ("../../data/point_cloud/cloud1_alignedB.pcd", *cloud);
 
     int N = cloud->points.size ();                // 数据点
 

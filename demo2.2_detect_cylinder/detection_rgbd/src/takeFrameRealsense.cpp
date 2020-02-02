@@ -42,7 +42,7 @@ int main() {
         for (int i = 0; i < matColor.rows; ++i) {
             uint16_t *p = matDepth.ptr<uint16_t>(i);
             for (int j = 0; j < matColor.cols; ++j) {
-                if (p[j] > 600 && p[j] < 700)
+                if (p[j] > 700 && p[j] < 900)
                     mask.at<uchar>(i, j) = 255;
             }
         }
@@ -56,7 +56,7 @@ int main() {
             points = pc.calculate(depth);
 
             PointCloudG pclPC = points2pcl(points);
-            pcl::io::savePCDFileBinary("../../data/point_cloud/cloud_realsense01.pcd", *pclPC);
+            pcl::io::savePCDFileBinary("../../data/point_cloud/cloud_realsense02.pcd", *pclPC);
             cout << "PointCloud after filtering has: " << pclPC->points.size() << " data points." << endl;
         }
     }

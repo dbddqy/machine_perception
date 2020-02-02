@@ -13,6 +13,9 @@
 #include <pcl/visualization/cloud_viewer.h>
 
 #include <librealsense2/rs.hpp>
+#include <opencv2/opencv.hpp>
+
+#include <vision.hpp>
 
 #include "pointCloud.hpp"
 
@@ -30,6 +33,26 @@ PointCloudG points2pcl(const rs2::points& points) {
         p.z = ptr->z;
         ptr++;
     }
+    return cloud;
+}
+
+PointCloudG mat2pcl(const cv::Mat& depth, const cv::Mat& mask) {
+    cout << "ignore me " << C.fx << endl;
+    PointCloudG cloud( new pcl::PointCloud<PointG> );
+    cloud->is_dense = false;
+    for ( int v=0; v<mask.rows; v++ )
+        for ( int u=0; u<mask.cols; u++ )
+        {
+            if (mask.ptr<uchar>(v)[u] == 0) continue;
+            unsigned int d = depth.ptr<unsigned short> ( v )[u]; // 深度值
+            if ( d==0 ) continue; // 为0表示没有测量到
+            PointG p ;
+            p.z = float(d)/1000.0f;
+            p.x = (u-C.cx)*p.z/C.fx;
+            p.y = (v-C.cy)*p.z/C.fy;
+
+            cloud->points.push_back( p );
+        }
     return cloud;
 }
 
