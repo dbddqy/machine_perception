@@ -1,0 +1,10 @@
+STATEMENT
+thesis development
+bamboo sticks as table substructure
+
+CONTENTS
+-design file
+-fabrication order
+-camera scan path
+
+

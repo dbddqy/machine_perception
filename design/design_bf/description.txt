@@ -1,0 +1,8 @@
+STATEMENT
+behavior and fabrication seminar
+part of thesis development
+
+CONTENTS
+-bamboo structure design
+-milling toolpath generation
+
