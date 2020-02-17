@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    double t0 = 0.0, t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 1.57;        // 估计参数值
+    double t0 = 0.0, t1 = 0.0, t2 = 100.0, t3 = 0.785, t4 = 0.0, t5 = 0.0;        // 估计参数值
     double translation[3] = {t0, t1, t2};
     double angleAxis[3] = {t3, t4, t5};
 
