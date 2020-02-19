@@ -32,6 +32,15 @@ target_link_libraries(takeFrameRealsense ${OpenCV_LIBS} ${realsense2_LIBRARY} ${
 add_executable(registerClouds registerClouds.cpp)
 target_link_libraries(registerClouds ${PCL_LIBRARIES})
 
+add_executable(ransac ransac.cpp)
+target_link_libraries(ransac ${PCL_LIBRARIES})
+
+add_executable(clean_cloud clean_cloud.cpp)
+target_link_libraries(clean_cloud ${PCL_LIBRARIES})
+
+add_executable(fitting fitting.cpp)
+target_link_libraries(fitting ${PCL_LIBRARIES} ${CERES_LIBRARIES})
+
 #target_link_libraries(main ${OpenCV_LIBS})
 #target_link_libraries(main ${freenect2_LIBRARIES})
 #target_link_libraries(main Eigen3::Eigen)

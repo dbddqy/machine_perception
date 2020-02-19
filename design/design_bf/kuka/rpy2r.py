@@ -28,6 +28,6 @@ def eulerAnglesToRotationMatrix(theta) :
     return R
 
 
-rpy = np.array([175.02, -10.81, 169.47])/180.0*math.pi
+rpy = np.array([-179.17, 39.98, -179.06])/180.0*math.pi
 
 print(eulerAnglesToRotationMatrix(rpy))
