@@ -16,5 +16,11 @@ find_package(realsense2 REQUIRED)
 add_executable(hand_eye_calib hand_eye_calib.cpp)
 target_link_libraries(hand_eye_calib PRIVATE ${CERES_LIBRARIES} Eigen3::Eigen)
 
+add_executable(hand_eye_calib_t hand_eye_calib_t.cpp)
+target_link_libraries(hand_eye_calib_t PRIVATE ${CERES_LIBRARIES} Eigen3::Eigen)
+
 add_executable(detect_marker detect_marker.cpp)
 target_link_libraries(detect_marker PRIVATE ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
+add_executable(detect_chessboard detect_chessboard.cpp)
+target_link_libraries(detect_chessboard PRIVATE ${OpenCV_LIBS} ${realsense2_LIBRARY})

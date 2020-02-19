@@ -1,5 +1,5 @@
 //
-// Created by yue on 15.02.20.
+// Created by yue on 19.02.20.
 //
 
 #include <iostream>
@@ -24,7 +24,7 @@ public:
                 << 1382.23, 0., 953.567
                 , 0., 1379.46, 532.635
                 , 0., 0., 1.);
-        distortion = (Mat_<double>(1, 5)
+        distortion = (Mat_<double >(1, 5)
                 << 0.0, 0.0, 0.0, 0.0, 0.0);
         MInv = M.inv();
         fx = 1382.23; fy = 1379.46; cx = 953.567; cy = 532.635;
@@ -34,35 +34,31 @@ public:
 CameraConfig C;
 
 bool detectChessboard(Mat img, Mat &tranc2o, Point &center) {
-    vector<vector<cv::Point2f>> rejectedCandidates;
-    cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::generateCustomDictionary(10, 6);
-    vector<vector<Point2f> > markerCorners;
-    vector<int> markerIds;
+    vector<Point2f> corners;
 
-    cv::aruco::detectMarkers(img, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
-    cv::aruco::drawDetectedMarkers(img, markerCorners, markerIds);
-    if (markerIds.size() == 0) return false;
+    bool pattern_was_found = cv::findChessboardCorners(img, cv::Size(9, 6), corners);
+    if (!pattern_was_found)
+        return false;
+    cv::drawChessboardCorners(img, cv::Size(9, 6), corners, pattern_was_found);
+    vector<Point3f> objectPoints;
 
-    vector<cv::Vec3d> rvecs, tvecs;
-    cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.28, C.M, C.distortion, rvecs, tvecs);
-    for (int i = 0; i < rvecs.size(); ++i) {
-        auto rvec = rvecs[i];
-        auto tvec = tvecs[i];
-        cv::aruco::drawAxis(img, C.M, C.distortion, rvec, tvec, 0.28);
+    for (int i = 0; i < 6; ++i)
+        for (int j = 0; j < 9; ++j)
+            objectPoints.push_back(Point3d(i*0.025, j*0.025, 0.0));
+    Mat rvec, tvec;
+    Mat matCorneres = Mat(corners).reshape(1);
+    Mat matObjectPoints = Mat(objectPoints).reshape(1);
+    solvePnP(matObjectPoints, matCorneres, C.M, C.distortion, rvec, tvec);
 
-        if (markerIds[i] == 0) {
-            center = 0.25 * (markerCorners[i][0]+markerCorners[i][1]+markerCorners[i][2]+markerCorners[i][3]);
-            Mat r;
-            Rodrigues(rvecs[i], r);
-            Mat t = (Mat_<double>(3, 1) << tvecs[i][0]*1000, tvecs[i][1]*1000, tvecs[i][2]*1000);
-            hconcat(r, t, tranc2o);
-            Mat down = (Mat_<double>(1, 4) << 0., 0., 0., 1.);
-            vconcat(tranc2o, down, tranc2o);
-            return true;
-        }
-    }
-    return false;
+    cv::aruco::drawAxis(img, C.M, C.distortion, rvec, tvec, 0.125);
+    center = corners[0];
+    Mat r;
+    Rodrigues(rvec, r);
+//    Mat t = (Mat_<double>(3, 1) << tvec[0]*1000, tvec[1]*1000, tvec[2]*1000);
+    hconcat(r, tvec, tranc2o);
+    Mat down = (Mat_<double>(1, 4) << 0., 0., 0., 1.);
+    vconcat(tranc2o, down, tranc2o);
+    return true;
 }
 
 int main(int argc, char **argv) {
@@ -89,18 +85,18 @@ int main(int argc, char **argv) {
 
         Mat tranc2o;
         Point center;
+
         if (detectChessboard(matColor, tranc2o, center))
             if (waitKey(1) == 's') {
                 cout << "depth: " << matDepth.at<int16_t>(center) << endl;
                 cout << "parameters: " << num_parameters_saved << endl;
-//                cout << tranc2o << endl;
                 for (int i = 0; i < 4; ++i)
                     for (int j = 0; j < 4; ++j)
                         cout << tranc2o.at<double>(i, j) << " ";
                 cout << endl << endl;
                 num_parameters_saved += 1;
             }
-        imshow("aruco", matColor);
+        imshow("chessboard", matColor);
     }
     return 0;
 }
