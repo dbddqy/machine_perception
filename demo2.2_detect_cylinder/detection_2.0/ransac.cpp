@@ -40,10 +40,10 @@ void extractCylinder(string path) {
     seg.setOptimizeCoefficients (true);
     seg.setModelType (pcl::SACMODEL_CYLINDER);
     seg.setMethodType (pcl::SAC_RANSAC);
-    seg.setNormalDistanceWeight (0.2);
+    seg.setNormalDistanceWeight (0.05);
     seg.setMaxIterations (10000);
     seg.setDistanceThreshold (0.05);
-    seg.setRadiusLimits (0.01, 0.04);
+    seg.setRadiusLimits (0.01, 0.025);
     seg.setInputCloud (cloud);
     seg.setInputNormals (cloud_normals);
 
@@ -66,7 +66,7 @@ void extractCylinder(string path) {
 }
 
 int main(int argc, char **argv) {
-    reader.read ("../test_data/data_1/cloud_merged.pcd", *cloud);
+    reader.read ("../test_data/data/cloud_merged.pcd", *cloud);
     std::cout << "PointCloud has: " << cloud->points.size () << " data points." << std::endl;
 
     // Estimate point normals
@@ -75,6 +75,6 @@ int main(int argc, char **argv) {
     ne.setKSearch (50);
     ne.compute (*cloud_normals);
 
-    extractCylinder("../test_data/data_1/cloud_cylinder.pcd");
+    extractCylinder("../test_data/data/cloud_cylinder.pcd");
     return 0;
 }

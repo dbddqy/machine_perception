@@ -38,6 +38,9 @@ target_link_libraries(ransac ${PCL_LIBRARIES})
 add_executable(clean_cloud clean_cloud.cpp)
 target_link_libraries(clean_cloud ${PCL_LIBRARIES})
 
+add_executable(downsample downsample.cpp)
+target_link_libraries(downsample ${PCL_LIBRARIES})
+
 add_executable(fitting fitting.cpp)
 target_link_libraries(fitting ${PCL_LIBRARIES} ${CERES_LIBRARIES})
 

@@ -20,7 +20,7 @@ pcl::PCDReader reader;
 pcl::PCDWriter writer;
 pcl::StatisticalOutlierRemoval<PointG> sor;
 
-const int COUNT = 9;
+const int COUNT = 11;
 
 int main(int argc, char **argv) {
     // e2c transformation
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
            0.0, 0.0, 0.0, 1.0;
     // w2e transformation
     ifstream file;
-    file.open("../test_data/data_2/robot_pose.txt", ios::in); // KUKA X Y Z A B C (in mm, degree)
+    file.open("../test_data/data2/robot_pose.txt", ios::in); // KUKA X Y Z A B C (in mm, degree)
     vector<Eigen::Matrix4d> w2e;
     for (int i = 0; i < COUNT; ++i) {
         double data[6];
@@ -49,13 +49,16 @@ int main(int argc, char **argv) {
     }
     file.close();
     // cylinder params
-    double cylinder[7] = {1.62165, -0.09601, 0.17847, 0.0, 1.0, 0.0, 0.0158};
+//    double cylinder[7] = {1.62165, -0.09601, 0.17847, 0.0, 1.0, 0.0, 0.0158};
+    double cylinder[7] = {0.05423, -2.47415, 1.32664, 0.0, 1.0, 0.0, 0.0158};  // 2cut
+//    double cylinder[7] = {1.68594, 0.5306, 0.24832, 0.55457148246, 0.83183737076, -0.02229482977, 0.018685};  //No.2
+//    double cylinder[7] = {1.61857, 0.7942, 0.29441, 0.91515029888, -0.26184958961, -0.30648772059, 0.019085};  //No.3
 
     PointCloudG clouds[COUNT];
     PointCloudG cloud_merged (new pcl::PointCloud<PointG>);
     for (int i = 0; i < COUNT; ++i) {
         PointCloudG cloud_c (new pcl::PointCloud<PointG>);
-        boost::format fmt( "../test_data/data_2/cloud_full0%d.pcd" );
+        boost::format fmt( "../test_data/data2/cloud_full0%d.pcd" );
         reader.read ((fmt%i).str(), *cloud_c);
 //        PointCloudG cloud_e (new pcl::PointCloud<PointG>);
 //        pcl::transformPointCloud(*cloud_c, *cloud_e, e2c.inverse().cast<float>());
@@ -89,9 +92,12 @@ int main(int argc, char **argv) {
                 min_dis = dis;
             if (dis > max_dis)
                 max_dis = dis;
-            if (abs(dis) < 0.03)
+            if (abs(dis) < 0.01) {
 //                cloud_cylinder->points.push_back(cloud_c->points[j]);
-                cloud_merged->points.push_back(cloud_c->points[j]);
+                PointG p2append;
+                p2append.x = p[0]; p2append.y = p[1]; p2append.z = p[2];
+                cloud_merged->points.push_back(p2append);
+            }
         }
 //        clouds[i] = cloud_cylinder;
         cout << "min: " << min_dis << endl;
@@ -112,14 +118,14 @@ int main(int argc, char **argv) {
 //    cout << icp.getFinalTransformation() << endl;
 
     // remove outliers
-    sor.setInputCloud (cloud_merged);
-    sor.setMeanK (50);
-    sor.setStddevMulThresh (0.5);
-    sor.filter (*cloud_merged);
+//    sor.setInputCloud (cloud_merged);
+//    sor.setMeanK (5);
+//    sor.setStddevMulThresh (0.5);
+//    sor.filter (*cloud_merged);
 
     cloud_merged->width = cloud_merged->points.size();
     cloud_merged->height = 1;
     cloud_merged->resize(cloud_merged->width*cloud_merged->height);
-    writer.write ("../test_data/data_2/cloud_merged.pcd", *cloud_merged, false);
+    writer.write ("../test_data/data2/cloud_merged.pcd", *cloud_merged, false);
     return 0;
 }

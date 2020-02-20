@@ -19,6 +19,27 @@ typedef pcl::PointCloud<PointG>::Ptr PointCloudG;
 using namespace std;
 using namespace cv;
 
+class CameraConfig {
+public:
+    Mat M;
+    Mat distortion;
+    Mat MInv;
+    double fx, fy, cx, cy;
+
+    CameraConfig() {
+        M = (Mat_<double>(3, 3)
+                << 1382.23, 0., 953.567
+                , 0., 1379.46, 532.635
+                , 0., 0., 1.);
+        distortion = (Mat_<double >(1, 5)
+                << 0.0, 0.0, 0.0, 0.0, 0.0);
+        MInv = M.inv();
+        fx = 1382.23; fy = 1379.46; cx = 953.567; cy = 532.635;
+    };
+};
+
+CameraConfig C;
+
 PointCloudG points2pcl(const rs2::points& points) {
     PointCloudG cloud(new pcl::PointCloud<pcl::PointXYZ>);
     auto sp = points.get_profile().as<rs2::video_stream_profile>();
@@ -48,6 +69,13 @@ int main(int argc, char **argv) {
     rs2::pointcloud pc;
     rs2::points points;
 
+    namedWindow("color", 0);
+//    namedWindow("with mask", 0);
+//    namedWindow("01", 0);
+    cvResizeWindow("color", 960, 540);
+//    cvResizeWindow("with mask", 960, 540);
+//    cvResizeWindow("01", 640, 360);
+
     int num_pc_saved = 0;
 
     // start
@@ -62,6 +90,7 @@ int main(int argc, char **argv) {
         Mat matDepth(Size(1920, 1080), CV_16U, (void*)depth.get_data(), Mat::AUTO_STEP);
 
         imshow("color", matColor);
+
 //        Mat mask = Mat::zeros(matDepth.size(), CV_8UC1);
 //        for (int i = 0; i < matColor.rows; ++i) {
 //            uint16_t *p = matDepth.ptr<uint16_t>(i);
@@ -80,7 +109,7 @@ int main(int argc, char **argv) {
             points = pc.calculate(depth);
 
             PointCloudG pclPC = points2pcl(points);
-            boost::format fmt( "../data/cloud_full0%d.pcd" );
+            boost::format fmt( "../test_data/data/cloud_full0%d.pcd" );
             pcl::io::savePCDFileBinary((fmt%num_pc_saved).str(), *pclPC);
             cout << "PointCloud has: " << pclPC->points.size() << " data points." << endl;
             num_pc_saved += 1;
