@@ -31,13 +31,13 @@ struct HAND_EYE_COST {
         Eigen::Matrix<T, 4, 4> _x2_Matrix = _x2.cast<T>();
         Eigen::Matrix<T, 4, 4> Cost_Matrix = _x1_Matrix * tran - tran * _x2_Matrix;
 //        residual[0] = (Cost_Matrix.array()*Cost_Matrix.array()).sum();
-//        residual[0] = Cost_Matrix(0, 0); residual[1] = Cost_Matrix(0, 1); residual[2] = Cost_Matrix(0, 2); residual[3] = Cost_Matrix(0, 3);
-//        residual[4] = Cost_Matrix(1, 0); residual[5] = Cost_Matrix(1, 1); residual[6] = Cost_Matrix(1, 2); residual[7] = Cost_Matrix(1, 3);
-//        residual[8] = Cost_Matrix(2, 0); residual[9] = Cost_Matrix(2, 1); residual[10] = Cost_Matrix(2, 2); residual[11] = Cost_Matrix(2, 3);
-//        residual[12] = Cost_Matrix(3, 0); residual[13] = Cost_Matrix(3, 1); residual[14] = Cost_Matrix(3, 2); residual[15] = Cost_Matrix(3, 3);
-        residual[0] = Cost_Matrix(0, 0); residual[1] = Cost_Matrix(0, 1); residual[2] = Cost_Matrix(0, 2);
-        residual[3] = Cost_Matrix(1, 0); residual[4] = Cost_Matrix(1, 1); residual[5] = Cost_Matrix(1, 2);
-        residual[6] = Cost_Matrix(2, 0); residual[7] = Cost_Matrix(2, 1); residual[8] = Cost_Matrix(2, 2);
+        residual[0] = Cost_Matrix(0, 0); residual[1] = Cost_Matrix(0, 1); residual[2] = Cost_Matrix(0, 2); residual[3] = Cost_Matrix(0, 3);
+        residual[4] = Cost_Matrix(1, 0); residual[5] = Cost_Matrix(1, 1); residual[6] = Cost_Matrix(1, 2); residual[7] = Cost_Matrix(1, 3);
+        residual[8] = Cost_Matrix(2, 0); residual[9] = Cost_Matrix(2, 1); residual[10] = Cost_Matrix(2, 2); residual[11] = Cost_Matrix(2, 3);
+        residual[12] = Cost_Matrix(3, 0); residual[13] = Cost_Matrix(3, 1); residual[14] = Cost_Matrix(3, 2); residual[15] = Cost_Matrix(3, 3);
+//        residual[0] = Cost_Matrix(0, 0); residual[1] = Cost_Matrix(0, 1); residual[2] = Cost_Matrix(0, 2);
+//        residual[3] = Cost_Matrix(1, 0); residual[4] = Cost_Matrix(1, 1); residual[5] = Cost_Matrix(1, 2);
+//        residual[6] = Cost_Matrix(2, 0); residual[7] = Cost_Matrix(2, 1); residual[8] = Cost_Matrix(2, 2);
 
         return true;
     }
@@ -45,23 +45,25 @@ struct HAND_EYE_COST {
     const Eigen::Matrix4d _x1, _x2;    // x数据
 };
 
-void readData(char *path, int n, vector<Eigen::Matrix4d> &As, vector<Eigen::Matrix4d> &Bs) {
-    ifstream file;
-    file.open(path, ios::in);
+void readData(char *path_w2e, char *path_c2o, int n, vector<Eigen::Matrix4d> &As, vector<Eigen::Matrix4d> &Bs) {
+    ifstream file_w2e, file_c2o;
+    file_w2e.open(path_w2e, ios::in);
+    file_c2o.open(path_c2o, ios::in);
     vector<Eigen::Matrix4d> tran_list_w2e, tran_list_c2o;
     for (int i = 0; i < n; ++i) {
         double data[16] = {0};
         for (auto& d : data)
-            file >> d;
-        data[3] = data[3] / 1000.0;
-        data[7] = data[7] / 1000.0;
-        data[11] = data[11] / 1000.0;
+            file_w2e >> d;
+        if (n >= 80) {
+            data[3] /= 1000.0; data[7] /= 1000.0; data[11] /= 1000.0;
+        }
         tran_list_w2e.emplace_back(Eigen::Map<Eigen::Matrix4d>(data).transpose());
         for (auto& d : data)
-            file >> d;
+            file_c2o >> d;
         tran_list_c2o.emplace_back(Eigen::Map<Eigen::Matrix4d>(data).transpose());
     }
-    file.close();
+    file_w2e.close();
+    file_c2o.close();
     for (int i = 0; i < n-1; ++i) {
         As.push_back(tran_list_w2e[i+1].inverse()*tran_list_w2e[i]);
         Bs.push_back(tran_list_c2o[i+1]*tran_list_c2o[i].inverse());
@@ -69,19 +71,19 @@ void readData(char *path, int n, vector<Eigen::Matrix4d> &As, vector<Eigen::Matr
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        cout << "please enter the file path" << endl;
-        return -1;
-    }
+//    if (argc != 2) {
+//        cout << "please enter the file path" << endl;
+//        return -1;
+//    }
 
     double t0 = 0.0, t1 = 0.0, t2 = 0.016, t3 = 0.0, t4 = 0.0, t5 = 0.01;        // 估计参数值
     double translation[3] = {t0, t1, t2};
     double angleAxis[3] = {t3, t4, t5};
 
     // 5 pairs of data
-    int N = 31;
+    int N = 80;
     vector<Eigen::Matrix4d> As, Bs; // As: Twe2.inv()*Twe1  Bs: Tco2*Tco1.inv()
-    readData(argv[1], N, As, Bs);
+    readData("../real_data/data_200219/data_w2e_80.txt", "../real_data/data_200219/data_c2o_80.txt", N, As, Bs);
     // "../fake_data/fake_data.txt"
 
     // 构建最小二乘问题
@@ -89,7 +91,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < N-1; i++) {
         problem.AddResidualBlock(     // 向问题中添加误差项
                 // 使用自动求导，模板参数：误差类型，输出维度，输入维度，维数要与前面struct中一致
-                new ceres::AutoDiffCostFunction<HAND_EYE_COST, 9, 3, 3>(
+                new ceres::AutoDiffCostFunction<HAND_EYE_COST, 16, 3, 3>(
                         new HAND_EYE_COST(As[i], Bs[i])
                 ),
                 nullptr,            // 核函数，这里不使用，为空

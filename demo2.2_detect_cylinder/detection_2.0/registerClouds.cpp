@@ -24,9 +24,9 @@ const int COUNT = 9;
 
 int main(int argc, char **argv) {
     // e2c transformation
-    double t[3] = {-0.0200116, 0.0142118, 0.176448};
-    double r[9] = {-0.0, -1.0, -0.0, 1.0, -0.0, 0.00, -0.00, -0.0, 1.0};
-//    double r[9] = {-0.308279, -0.921524, -0.236128, 0.946413, -0.322216, 0.0218963, -0.0962622, -0.216724, 0.971475};
+    double t[3] = {-0.0153632, 0.042317, 0.139266};
+//    double r[9] = {-0.0, -1.0, -0.0, 1.0, -0.0, 0.00, -0.00, -0.0, 1.0};
+    double r[9] = {-0.000174572, -1, -0.000177886, 0.999979, -0.000175714, 0.00644069, -0.00644072, -0.000176758, 0.999979};
     Eigen::Matrix4d e2c;
     e2c << r[0], r[3], r[6], t[0],
            r[1], r[4], r[7], t[1],
@@ -34,15 +34,15 @@ int main(int argc, char **argv) {
            0.0, 0.0, 0.0, 1.0;
     // w2e transformation
     ifstream file;
-    file.open("../test_data/data_1/robot_pose.txt", ios::in);
+    file.open("../test_data/data_2/robot_pose.txt", ios::in); // KUKA X Y Z A B C (in mm, degree)
     vector<Eigen::Matrix4d> w2e;
     for (int i = 0; i < COUNT; ++i) {
         double data[6];
         for (auto& d : data)
             file >> d;
-        Eigen::Quaterniond q = Eigen::AngleAxisd(data[5]*M_PI/180.0, Eigen::Vector3d::UnitZ())
+        Eigen::Quaterniond q = Eigen::AngleAxisd(data[3]*M_PI/180.0, Eigen::Vector3d::UnitZ())
                             * Eigen::AngleAxisd(data[4]*M_PI/180.0, Eigen::Vector3d::UnitY())
-                            * Eigen::AngleAxisd(data[3]*M_PI/180.0, Eigen::Vector3d::UnitX());
+                            * Eigen::AngleAxisd(data[5]*M_PI/180.0, Eigen::Vector3d::UnitX());
         Eigen::Isometry3d T(q);
         T.pretranslate(Eigen::Vector3d(data[0]/1000.0, data[1]/1000.0, data[2]/1000.0));
         w2e.push_back(T.matrix());
@@ -52,10 +52,10 @@ int main(int argc, char **argv) {
     double cylinder[7] = {1.62165, -0.09601, 0.17847, 0.0, 1.0, 0.0, 0.0158};
 
     PointCloudG clouds[COUNT];
-    PointCloudG cloud_merged;// (new pcl::PointCloud<PointG>);
+    PointCloudG cloud_merged (new pcl::PointCloud<PointG>);
     for (int i = 0; i < COUNT; ++i) {
         PointCloudG cloud_c (new pcl::PointCloud<PointG>);
-        boost::format fmt( "../test_data/data_1/cloud_full0%d.pcd" );
+        boost::format fmt( "../test_data/data_2/cloud_full0%d.pcd" );
         reader.read ((fmt%i).str(), *cloud_c);
 //        PointCloudG cloud_e (new pcl::PointCloud<PointG>);
 //        pcl::transformPointCloud(*cloud_c, *cloud_e, e2c.inverse().cast<float>());
@@ -90,25 +90,25 @@ int main(int argc, char **argv) {
             if (dis > max_dis)
                 max_dis = dis;
             if (abs(dis) < 0.03)
-                cloud_cylinder->points.push_back(cloud_c->points[j]);
-//                cloud_merged->points.push_back(cloud_c->points[j]);
+//                cloud_cylinder->points.push_back(cloud_c->points[j]);
+                cloud_merged->points.push_back(cloud_c->points[j]);
         }
-        clouds[i] = cloud_cylinder;
+//        clouds[i] = cloud_cylinder;
         cout << "min: " << min_dis << endl;
         cout << "max: " << max_dis << endl;
     }
 
-    cloud_merged = clouds[0];
-    pcl::IterativeClosestPoint<PointG, PointG> icp;
-    cout << "cloud 0: " << clouds[0]->points.size() << endl;
-    for (int i = 1; i < COUNT; ++i) {
-        cout << "cloud " << i << ": " << clouds[i]->points.size() << endl;
-        icp.setInputSource(clouds[i]);
-        icp.setInputTarget(cloud_merged);
-        pcl::PointCloud<PointG> final;
-        icp.align(final);
-        *cloud_merged += final;
-    }
+//    cloud_merged = clouds[0];
+//    pcl::IterativeClosestPoint<PointG, PointG> icp;
+//    cout << "cloud 0: " << clouds[0]->points.size() << endl;
+//    for (int i = 1; i < COUNT; ++i) {
+//        cout << "cloud " << i << ": " << clouds[i]->points.size() << endl;
+//        icp.setInputSource(clouds[i]);
+//        icp.setInputTarget(cloud_merged);
+//        pcl::PointCloud<PointG> final;
+//        icp.align(final);
+//        *cloud_merged += final;
+//    }
 //    cout << icp.getFinalTransformation() << endl;
 
     // remove outliers
@@ -120,6 +120,6 @@ int main(int argc, char **argv) {
     cloud_merged->width = cloud_merged->points.size();
     cloud_merged->height = 1;
     cloud_merged->resize(cloud_merged->width*cloud_merged->height);
-    writer.write ("../test_data/data_1/cloud_merged.pcd", *cloud_merged, false);
+    writer.write ("../test_data/data_2/cloud_merged.pcd", *cloud_merged, false);
     return 0;
 }
