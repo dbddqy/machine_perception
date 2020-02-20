@@ -53,6 +53,9 @@ void readData(char *path, int n, vector<Eigen::Matrix4d> &As, vector<Eigen::Matr
         double data[16] = {0};
         for (auto& d : data)
             file >> d;
+        data[3] = data[3] / 1000.0;
+        data[7] = data[7] / 1000.0;
+        data[11] = data[11] / 1000.0;
         tran_list_w2e.emplace_back(Eigen::Map<Eigen::Matrix4d>(data).transpose());
         for (auto& d : data)
             file >> d;
@@ -71,12 +74,12 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    double t0 = 0.0, t1 = 0.0, t2 = 160.0, t3 = 0.0, t4 = 0.0, t5 = 0.01;        // 估计参数值
+    double t0 = 0.0, t1 = 0.0, t2 = 0.016, t3 = 0.0, t4 = 0.0, t5 = 0.01;        // 估计参数值
     double translation[3] = {t0, t1, t2};
     double angleAxis[3] = {t3, t4, t5};
 
     // 5 pairs of data
-    int N = 5;
+    int N = 31;
     vector<Eigen::Matrix4d> As, Bs; // As: Twe2.inv()*Twe1  Bs: Tco2*Tco1.inv()
     readData(argv[1], N, As, Bs);
     // "../fake_data/fake_data.txt"

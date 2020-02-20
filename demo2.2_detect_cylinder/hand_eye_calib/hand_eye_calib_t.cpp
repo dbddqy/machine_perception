@@ -20,14 +20,14 @@ struct HAND_EYE_COST {
             const T *const translation, // 3 dim
             T *residual) const {
         Eigen::Matrix<T, 4, 4> tran;
-//        tran << T(-0.308279), T(0.946413), T(-0.0962622), translation[0],
-//                T(-0.921524), T(-0.322216), T(-0.216724), translation[1],
-//                T(-0.236128), T(0.0218963), T(0.971475), translation[2],
-//                T(0.0), T(0.0), T(0.0), T(1.0);
-        tran << T(-0.0), T(1.0), T(-0.0), translation[0],
-                T(-1.0), T(-0.0), T(-0.0), translation[1],
-                T(-0.0), T(0.0), T(1.0), translation[2],
+        tran << T(0.0169028), T(0.999607), T(-0.0223445), translation[0],
+                T(-0.999788), T(0.016635), T(-0.0121177), translation[1],
+                T(-0.0117412), T(0.0225446), T(0.999677), translation[2],
                 T(0.0), T(0.0), T(0.0), T(1.0);
+//        tran << T(-0.0), T(1.0), T(-0.0), translation[0],
+//                T(-1.0), T(-0.0), T(-0.0), translation[1],
+//                T(-0.0), T(0.0), T(1.0), translation[2],
+//                T(0.0), T(0.0), T(0.0), T(1.0);
         Eigen::Matrix<T, 4, 4> _x1_Matrix = _x1.cast<T>();
         Eigen::Matrix<T, 4, 4> _x2_Matrix = _x2.cast<T>();
         Eigen::Matrix<T, 4, 4> Cost_Matrix = _x1_Matrix * tran - tran * _x2_Matrix;
@@ -52,6 +52,9 @@ void readData(char *path, int n, vector<Eigen::Matrix4d> &As, vector<Eigen::Matr
         double data[16] = {0};
         for (auto& d : data)
             file >> d;
+        data[3] = data[3] / 1000.0;
+        data[7] = data[7] / 1000.0;
+        data[11] = data[11] / 1000.0;
         tran_list_w2e.emplace_back(Eigen::Map<Eigen::Matrix4d>(data).transpose());
         for (auto& d : data)
             file >> d;
@@ -74,7 +77,7 @@ int main(int argc, char **argv) {
     double translation[3] = {t0, t1, t2};
 
     // 5 pairs of data
-    int N = 5;
+    int N = 31;
     vector<Eigen::Matrix4d> As, Bs; // As: Twe2.inv()*Twe1  Bs: Tco2*Tco1.inv()
     readData(argv[1], N, As, Bs);
     // "../fake_data/fake_data.txt"
