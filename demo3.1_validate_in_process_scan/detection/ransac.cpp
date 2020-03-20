@@ -42,7 +42,7 @@ void extractCylinder(string path) {
     seg.setMethodType (pcl::SAC_RANSAC);
     seg.setNormalDistanceWeight (0.1);
     seg.setMaxIterations (500000);
-    seg.setDistanceThreshold (5);
+    seg.setDistanceThreshold (1);
     seg.setRadiusLimits (3, 15);
     seg.setInputCloud (cloud);
     seg.setInputNormals (cloud_normals);

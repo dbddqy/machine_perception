@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 //    }
 
 //    double time_total = 0.0;
-    int num_frames = 16;
+    int num_frames = 32;
     for (int frame_index = 0; frame_index < num_frames; ++frame_index) {
         PointCloudG cloud(new pcl::PointCloud<PointG>);
         PointCloudG cloud_filtered(new pcl::PointCloud<PointG>);

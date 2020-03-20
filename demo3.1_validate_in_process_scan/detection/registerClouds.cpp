@@ -22,7 +22,7 @@ pcl::PCDWriter writer;
 pcl::StatisticalOutlierRemoval<PointG> sor;
 
 int main(int argc, char **argv) {
-    int num_frames = 16;
+    int num_frames = 32;
 
     PointCloudG clouds_full[num_frames];
     PointCloudG cloud_aligned (new pcl::PointCloud<PointG>);

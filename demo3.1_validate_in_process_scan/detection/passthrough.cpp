@@ -24,7 +24,8 @@ int main(int argc, char **argv) {
 
     pass.setInputCloud (cloud);
     pass.setFilterFieldName ("x");
-    pass.setFilterLimits (75.1, 333.6);
+//    pass.setFilterLimits (75.1, 333.6);
+    pass.setFilterLimits (75.1, 155.1); // small segments
     pass.filter (*cloud);
     pass.setInputCloud (cloud);
     pass.setFilterFieldName ("y");
