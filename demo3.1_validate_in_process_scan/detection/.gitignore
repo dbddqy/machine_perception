@@ -1,5 +1,4 @@
 *.3dmbak
-*.3dm.rhl
 *.stlbak
 
 cmake-build-debug/

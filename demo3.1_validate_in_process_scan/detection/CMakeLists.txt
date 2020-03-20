@@ -1,4 +1,4 @@
-project (cylinder_2.0)
+project (detection)
 set(CMAKE_CXX_FLAGS "-std=c++14 -O3")
 cmake_minimum_required(VERSION 3.15)
 
@@ -26,8 +26,15 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(takeFrameRealsense takeFrameRealsense.cpp)
-target_link_libraries(takeFrameRealsense ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
+#new
+add_executable(takeFrame2D takeFrame2D.cpp)
+target_link_libraries(takeFrame2D ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
+add_executable(construct3D construct3D.cpp)
+target_link_libraries(construct3D ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
+
+add_executable(takeFrame3D takeFrame3D.cpp)
+target_link_libraries(takeFrame3D ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
 
 add_executable(registerClouds registerClouds.cpp)
 target_link_libraries(registerClouds ${PCL_LIBRARIES})
@@ -40,6 +47,9 @@ target_link_libraries(clean_cloud ${PCL_LIBRARIES})
 
 add_executable(downsample downsample.cpp)
 target_link_libraries(downsample ${PCL_LIBRARIES})
+
+add_executable(passthrough passthrough.cpp)
+target_link_libraries(passthrough ${PCL_LIBRARIES})
 
 add_executable(combine_cloud combine_cloud.cpp)
 target_link_libraries(combine_cloud ${PCL_LIBRARIES})
