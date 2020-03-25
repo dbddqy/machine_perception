@@ -39,7 +39,7 @@ Time used(cpu:Intel(R) Xeon(R) CPU_E3-1231 v3 @ 3.40GHz):
 
 ## **Realsense 415 (camera fixed on tripod)**
 
-Same workflow, expect that ICP is no longer required.
+Same workflow, except that ICP is no longer required.
 
 | Number of frames | Estimated radius |     Error      |
 | :--------------: | :--------------: | :------------: |

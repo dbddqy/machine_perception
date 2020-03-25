@@ -60,6 +60,12 @@ target_link_libraries(combine_cloud ${PCL_LIBRARIES})
 add_executable(fitting fitting.cpp)
 target_link_libraries(fitting ${PCL_LIBRARIES} ${CERES_LIBRARIES})
 
+add_executable(test_chessboard test_chessboard.cpp)
+target_link_libraries(test_chessboard ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
+add_executable(level_circleboard level_circleboard.cpp)
+target_link_libraries(level_circleboard ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
 #target_link_libraries(main ${OpenCV_LIBS})
 #target_link_libraries(main ${freenect2_LIBRARIES})
 #target_link_libraries(main Eigen3::Eigen)

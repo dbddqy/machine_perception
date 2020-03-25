@@ -74,6 +74,32 @@ bool detectMarker(Mat img, Mat &tranc2o, Point &center) {
     return false;
 }
 
+bool detectCircleboard(Mat img, Mat &tranc2o, Point &center) {
+    vector<Point2f> centers;
+    bool pattern_was_found = findCirclesGrid(img, cv::Size(2, 13), centers, CALIB_CB_ASYMMETRIC_GRID);
+    if (!pattern_was_found)
+        return false;
+    cv::drawChessboardCorners(img, cv::Size(2, 13), Mat(centers), pattern_was_found);
+    vector<Point3f> objectPoints;
+
+    for (int i = 0; i < 13; ++i)
+        for (int j = 0; j < 2; ++j)
+            objectPoints.push_back(Point3d(i*0.02, j*0.04+(i%2)*0.02, 0.0));
+    Mat rvec, tvec;
+    Mat matCorneres = Mat(centers).reshape(1);
+    Mat matObjectPoints = Mat(objectPoints).reshape(1);
+    solvePnP(matObjectPoints, matCorneres, C.M, C.distortion, rvec, tvec);
+
+    cv::aruco::drawAxis(img, C.M, C.distortion, rvec, tvec, 0.04);
+    center = centers[0];
+    Mat r;
+    Rodrigues(rvec, r);
+    hconcat(r, tvec*1000.0, tranc2o);
+    Mat down = (Mat_<double>(1, 4) << 0., 0., 0., 1.);
+    vconcat(tranc2o, down, tranc2o);
+    return true;
+}
+
 pcl::PCDWriter writer;
 
 int main(int argc, char **argv) {
@@ -84,9 +110,9 @@ int main(int argc, char **argv) {
     int num_frames = stoi(argv[1]);
     Mat matColor = imread("../data2D/color.png");
     // get marker pose
-    Mat tran_c2o;
+    Mat tran_c2o(Size(4, 4), CV_64F);
     Point center;
-    if (detectMarker(matColor, tran_c2o, center)) {
+    if (detectCircleboard(matColor, tran_c2o, center)) {
         cout << "marker pose : "<< endl;
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j)
@@ -121,12 +147,12 @@ int main(int argc, char **argv) {
             Mat p_o = tran_o2c * p_c;
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
 //            if (pt.x > 55.1 && pt.x < 333.6)
-            if (pt.x > 75.1 && pt.x < 155.1) // small segment
-                if (pt.z > 34.25)
-                    if (pt.y > -82.4 && pt.y < 8.6) {
+            if (pt.x > 10.0 && pt.x < 90.0) // small segment
+                if (pt.y > -30.0 && pt.y < 0.0)
+                    if (pt.z > 30.0 && pt.z < 80.0) {
                         mask.at<uchar>(v, u) = 255;
+                        cloud_full->points.push_back(pt);
                     }
-            cloud_full->points.push_back(pt);
         }
     }
     Mat colorWithMask;
@@ -142,7 +168,7 @@ int main(int argc, char **argv) {
 
     cloud_full->width = cloud_full->points.size();
     cloud_full->height = 1;
-    writer.write("../data3D/cloud_aligned.pcd", *cloud_full, false);
+    writer.write("../data3D/cloud_passthrough.pcd", *cloud_full, false);
     cout << "PointCloud has: " << cloud_full->points.size() << " data points." << endl;
 
     return 0;
