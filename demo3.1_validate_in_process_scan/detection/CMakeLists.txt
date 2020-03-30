@@ -36,6 +36,9 @@ target_link_libraries(construct3D ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIB
 add_executable(construct3D_average construct3D_average.cpp)
 target_link_libraries(construct3D_average ${OpenCV_LIBS} ${PCL_LIBRARIES})
 
+add_executable(construct3D_built construct3D_built/construct3D_built.cpp construct3D_built/construct3D_built.hpp)
+target_link_libraries(construct3D_built ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
 add_executable(takeFrame3D takeFrame3D.cpp)
 target_link_libraries(takeFrame3D ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
 

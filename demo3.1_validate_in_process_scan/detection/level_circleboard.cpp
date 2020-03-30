@@ -34,7 +34,7 @@ public:
 
 CameraConfig C;
 
-bool detectCircleboard(Mat img, Mat &tranc2o, Point &center) {
+bool detectChessboard(Mat img, Mat &tranc2o, Point &center) {
     vector<Point2f> centers;
     bool pattern_was_found = findCirclesGrid(img, cv::Size(2, 13), centers, CALIB_CB_ASYMMETRIC_GRID);
     if (!pattern_was_found)
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
         Mat tran_c2o;
         Point center;
 
-        if (detectCircleboard(matColor, tran_c2o, center)) {
+        if (detectChessboard(matColor, tran_c2o, center)) {
             Mat tran_02c = tran_c2o.inv();
             Mat R = tran_02c(Rect(0, 0, 3, 3));
             Vec3f zyxAngles = rotationMatrixToEulerAngles(R) / M_PI * 180.0;
