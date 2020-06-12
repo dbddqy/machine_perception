@@ -120,13 +120,13 @@ int main(int argc, char **argv) {
         cout << endl;
     }
     Mat tran_o2c = tran_c2o.inv();
-    imshow("aruco", matColor);
 
     Mat matsDepth[num_frames];
     for (int frame_index = 0; frame_index < num_frames; ++frame_index)
         matsDepth[frame_index] = imread((boost::format("../data2D/depth_%d.png") % frame_index).str(), CV_LOAD_IMAGE_UNCHANGED);
 
     Mat mask = Mat::zeros(matColor.size(), CV_8UC1);
+    Mat mask_blue = Mat::zeros(matColor.size(), CV_8UC3);
     PointCloudG cloud_full(new pcl::PointCloud<PointG>);
     for (int v = 0; v < matColor.rows; ++v) {
         for (int u = 0; u < matColor.cols; ++u) {
@@ -146,18 +146,36 @@ int main(int argc, char **argv) {
                     << ((double)u - C.cx) * dis_average / C.fx, ((double)v - C.cy) * dis_average / C.fy, dis_average, 1.0);
             Mat p_o = tran_o2c * p_c;
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-//            if (pt.x > -9.0 && pt.x < 71.0) // segment 1
-            if (pt.x > 146.0 && pt.x < 226.0) // segment 2
-                if (pt.y > -30.0 && pt.y < 0.0)
-                    if (pt.z > 30.0 && pt.z < 80.0) {
-                        mask.at<uchar>(v, u) = 255;
-                        cloud_full->points.push_back(pt);
-                    }
+////            if (pt.x > -9.0 && pt.x < 71.0) // segment 1
+//            if (pt.x > 146.0 && pt.x < 226.0) // segment 2
+////            if ((pt.x > -9.0 && pt.x < 71.0) || (pt.x > 146.0 && pt.x < 226.0)) // segment 1 and 2
+//                if (pt.y > -30.0 && pt.y < 0.0)
+//                    if (pt.z > 30.0 && pt.z < 80.0) {
+//                        mask.at<uchar>(v, u) = 255;
+//                        mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
+//                        cloud_full->points.push_back(pt);
+//                    }
+            if (pt.x > -40.0) // built
+                if (pt.z > 10.0 || (pt.x > 280.0 && pt.z > -40.0)) {
+                    mask.at<uchar>(v, u) = 255;
+                    mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
+                    cloud_full->points.push_back(pt);
+                }
         }
     }
     Mat colorWithMask;
     matColor.copyTo(colorWithMask, mask);
-    imshow("with mask", colorWithMask);
+
+    // draw
+    vector<vector<Point> > contours;
+    findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+    drawContours(matColor, contours, -1, Scalar(255, 0, 0));
+
+    addWeighted(matColor, 1.0, mask_blue, 0.4, 0.0, matColor);
+
+    imshow("circleboard", matColor);
+//    imshow("with mask", colorWithMask);
+    imwrite("../data2D/color_detected.png", matColor);
     waitKey();
 
 //        chrono::steady_clock::time_point t_start = chrono::steady_clock::now(); // timing start

@@ -89,55 +89,6 @@ double dis(Vec3d p1, Vec3d p2) {
     return sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
 }
 
-void grow(cv::Mat& src, cv::Mat& mask, cv::Point seed, int threshold) {
-    /* apply "seed grow" in a given seed
-     * Params:
-     *   src: source image
-     *   mask: a matrix records the region found in current "seed grow"
-     */
-    const cv::Point PointShift2D[4] =
-            {
-                    cv::Point(1, 0),
-                    cv::Point(0, -1),
-                    cv::Point(-1, 0),
-                    cv::Point(0, 1),
-            };
-
-    stack<cv::Point> point_stack;
-    point_stack.push(seed);
-
-    while(!point_stack.empty()) {
-        cv::Point center = point_stack.top();
-        mask.at<uchar>(center) = 1;
-        point_stack.pop();
-
-        for (int i=0; i<4; ++i) {
-            cv::Point estimating_point = center + PointShift2D[i];
-            if (estimating_point.x < 0
-                || estimating_point.x > src.cols-1
-                || estimating_point.y < 0
-                || estimating_point.y > src.rows-1) {
-                // estimating_point should not out of the range in image
-                continue;
-            } else {
-                int delta=0;
-                if (src.type() == CV_16U)
-                    delta = (int)abs(src.at<uint16_t>(center) - src.at<uint16_t>(estimating_point));
-                    // delta = (R-R')^2 + (G-G')^2 + (B-B')^2
-                else
-                    delta = int(pow(src.at<cv::Vec3b>(center)[0] - src.at<cv::Vec3b>(estimating_point)[0], 2)
-                                + pow(src.at<cv::Vec3b>(center)[1] - src.at<cv::Vec3b>(estimating_point)[1], 2)
-                                + pow(src.at<cv::Vec3b>(center)[2] - src.at<cv::Vec3b>(estimating_point)[2], 2));
-                if (mask.at<uchar>(estimating_point) == 0
-                    && delta < threshold) {
-                    mask.at<uchar>(estimating_point) = 1;
-                    point_stack.push(estimating_point);
-                }
-            }
-        }
-    }
-}
-
 double distance2cylinder(double *cylinder_param, PointG pt, double start_param, double end_param) {
     Vec3d start(cylinder_param[1], cylinder_param[2], cylinder_param[3]);
     Vec3d dir(cylinder_param[4], cylinder_param[5], cylinder_param[6]);
@@ -147,6 +98,17 @@ double distance2cylinder(double *cylinder_param, PointG pt, double start_param, 
     if ((p-p_start).dot(dir) < 0) return 0; // 0: not in the segment
     if ((p_end-p).dot(dir) < 0) return 0; // 0: not in the segment
     return sqrt((p-p_start).dot(p-p_start)-pow((p-p_start).dot(dir), 2)) - cylinder_param[0];
+}
+
+vector<Point> selected_centers;
+void mouseCallback(int event, int x, int y, int flags, void *param) {
+    Mat &image=*(Mat *) param;
+    switch(event) {
+        case EVENT_LBUTTONDOWN:
+            selected_centers.emplace_back(x, y);
+            circle(image, Point(x, y), 20, Scalar(0, 0, 255));
+            break;
+    }
 }
 
 pcl::PCDWriter writer;
@@ -161,8 +123,12 @@ int main(int argc, char **argv) {
     const double SRART_PARAM = stod(argv[3]);
     const double END_PARAM = stod(argv[4]);
 
+    namedWindow("circleboard", 0);
+    cvResizeWindow("circleboard", 1920, 1080);
+
     // read color frame
     Mat matColor = imread("../data2D/color.png");
+    setMouseCallback("circleboard", mouseCallback, (void*)&matColor);//鼠标操作回调函数
     // get marker pose
     Mat tran_c2o(Size(4, 4), CV_64F);
     Point center;
@@ -206,7 +172,7 @@ int main(int argc, char **argv) {
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
 //            double dis2cylinder = distance2cylinder(cylinder_params[POLE_INDEX], pt, SRART_PARAM, END_PARAM);
 //            if (dis2cylinder != 0 && abs(dis2cylinder) < 20.0 && pt.z > -15.0)
-            if (pt.x < -60.0 && pt.y < 30.0 && pt.z > 390.0) // built
+            if (pt.x > -60.0 && pt.y < 30.0 && pt.z > 390.0) // built
             {
                 mask.at<uchar>(v, u) = 255;
                 mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
@@ -216,52 +182,39 @@ int main(int argc, char **argv) {
             }
         }
     }
-    Mat colorWithMask;
-    matColor.copyTo(colorWithMask, mask);
 
-    // detect holes
     vector<vector<Point> > contours;
     findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
     drawContours(matColor, contours, -1, Scalar(255, 0, 0));
-    cout << contours.size() << endl;
-    Rect2d rect = boundingRect(contours[0]);
-    Mat colorWithMaskRect =  matColor(rect);
-    cvtColor(colorWithMaskRect, colorWithMaskRect, CV_BGR2GRAY);
-    vector<Vec3f> circles;
-    HoughCircles(colorWithMaskRect, circles, CV_HOUGH_GRADIENT, 1.2, 10, 100, 15, 6, 12);
-    vector<PointCloudG> clouds_hole;
-    for (auto c : circles) {
-        cout << "hole found!" << endl;
-        circle(matColor, Point(c[0]+rect.x, c[1]+rect.y), c[2]*2, Scalar(0, 0, 255));
-        // add points on the circle to the clouds
-        vector<Point> points_on_circle;
-        ellipse2Poly(Point(c[0]+rect.x, c[1]+rect.y), Size(c[2]-2, c[2]-2), 0, 0, 360, 1, points_on_circle);
-        PointCloudG cloud_hole(new pcl::PointCloud<PointG>);
-        for (auto p : points_on_circle) {
-            double dis_average = 0.0;
-            bool use_frame = true;
-            for  (int frame_index = 0; frame_index < NUM_FRAMES; ++frame_index) {
-                double d = (double)matsDepth[frame_index].ptr<uint16_t>(p.y)[p.x] * 0.1; // unit: 0.1mm
-                if (d == 0.0) { use_frame = false; break;}
-                dis_average += d;
-            }
-            if (!use_frame) continue;
-            dis_average /= NUM_FRAMES;
-            // 3d reconstruction
-            if (dis_average == 0.0 || dis_average > 1500.0f) continue;
-            Mat p_c = (Mat_<double>(4, 1)
-                    << ((double)p.x - C.cx) * dis_average / C.fx, ((double)p.y - C.cy) * dis_average / C.fy, dis_average, 1.0);
-            Mat p_o = tran_o2c * p_c;
-            PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-            cloud_hole->points.push_back(pt);
+    addWeighted(matColor, 1.0, mask_blue, 0.4, 0.0, matColor);
+
+    // select centers
+    while (selected_centers.size() < 2){
+        imshow("circleboard", matColor);
+        waitKey(1);
+    }
+    imshow("circleboard", matColor);
+
+    // print 3d-points
+    for (auto p : selected_centers) {
+        double dis_average = 0.0;
+        bool use_frame = true;
+        for  (int frame_index = 0; frame_index < NUM_FRAMES; ++frame_index) {
+            double d = (double)matsDepth[frame_index].ptr<uint16_t>(p.y)[p.x] * 0.1; // unit: 0.1mm
+            if (d == 0.0) { cout << "invalid point" << endl; use_frame = false; break;}
+            dis_average += d;
         }
-        clouds_hole.push_back(cloud_hole);
+        if (!use_frame) continue;
+        dis_average /= NUM_FRAMES;
+        // 3d reconstruction
+        Mat p_c = (Mat_<double>(4, 1)
+                << ((double)p.x - C.cx) * dis_average / C.fx, ((double)p.y - C.cy) * dis_average / C.fy, dis_average, 1.0);
+        Mat p_o = tran_o2c * p_c;
+        PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
+        cout << pt << endl;
     }
 
-    addWeighted(matColor, 1.0, mask_blue, 0.4, 0.0, matColor);
-    imshow("chessboard", matColor);
     imwrite("../data2D/color_detected.png", matColor);
-//    imshow("colorWithMaskHoles", colorWithMaskHoles);
     waitKey();
 
 //        chrono::steady_clock::time_point t_start = chrono::steady_clock::now(); // timing start
@@ -273,13 +226,6 @@ int main(int argc, char **argv) {
     cloud_full->height = 1;
     writer.write("../data3D/cloud_passthrough.pcd", *cloud_full, false);
     cout << "PointCloud has: " << cloud_full->points.size() << " data points." << endl;
-
-    // save clouds_hole
-    for (int i = 0; i < clouds_hole.size(); ++i) {
-        clouds_hole[i]->width = clouds_hole[i]->points.size();
-        clouds_hole[i]->height = 1;
-        writer.write((boost::format("../data3D/circle_%d.pcd")%i).str(), *(clouds_hole[i]), false);
-    }
 
     return 0;
 }
