@@ -1,6 +1,9 @@
 *.3dmbak
 *.3dm.rhl
 *.stlbak
+serial_input/
+experiment_1/
+experiment_2/
 
 cmake-build-debug/
 hide/
