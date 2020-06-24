@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
             double dis_average = 0.0;
             bool use_frame = true;
             for  (int frame_index = 0; frame_index < num_frames; ++frame_index) {
-                double d = (double)matsDepth[frame_index].ptr<uint16_t>(v)[u];
+                double d = (double)matsDepth[frame_index].ptr<uint16_t>(v)[u] / 10.;
                 if (d == 0.0) { use_frame = false; break;}
                 dis_average += d;
             }
@@ -155,8 +155,8 @@ int main(int argc, char **argv) {
 //                        mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
 //                        cloud_full->points.push_back(pt);
 //                    }
-            if (pt.x > -40.0) // built
-                if (pt.z > 10.0 || (pt.x > 280.0 && pt.z > -40.0)) {
+            if (pt.x > -45.0) // built
+                if (pt.z > 30.0 &&  (pt.y > 10.0 && pt.y < 500.0)) {
                     mask.at<uchar>(v, u) = 255;
                     mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
                     cloud_full->points.push_back(pt);

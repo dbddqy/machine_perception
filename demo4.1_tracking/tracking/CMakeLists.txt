@@ -21,5 +21,8 @@ add_definitions(${PCL_DEFINITIONS})
 
 #new
 add_executable(main main.cpp)
-#target_link_libraries(main ${OpenCV_LIBS} ${realsense2_LIBRARY} ${CERES_LIBRARIES})
-target_link_libraries(main ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES} ${CERES_LIBRARIES})
+target_link_libraries(main ${OpenCV_LIBS} ${realsense2_LIBRARY} ${CERES_LIBRARIES})
+#target_link_libraries(main ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES} ${CERES_LIBRARIES})
+
+add_executable(demo_a_assembly demo_a_assembly.cpp)
+target_link_libraries(demo_a_assembly ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
