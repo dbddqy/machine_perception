@@ -146,21 +146,22 @@ int main(int argc, char **argv) {
                     << ((double)u - C.cx) * dis_average / C.fx, ((double)v - C.cy) * dis_average / C.fy, dis_average, 1.0);
             Mat p_o = tran_o2c * p_c;
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-////            if (pt.x > -9.0 && pt.x < 71.0) // segment 1
+//            if (pt.x > -9.0 && pt.x < 71.0) // segment 1
 //            if (pt.x > 146.0 && pt.x < 226.0) // segment 2
-////            if ((pt.x > -9.0 && pt.x < 71.0) || (pt.x > 146.0 && pt.x < 226.0)) // segment 1 and 2
-//                if (pt.y > -30.0 && pt.y < 0.0)
-//                    if (pt.z > 30.0 && pt.z < 80.0) {
-//                        mask.at<uchar>(v, u) = 255;
-//                        mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
-//                        cloud_full->points.push_back(pt);
-//                    }
-            if (pt.x > -45.0) // built
-                if (pt.z > 30.0 &&  (pt.y > 10.0 && pt.y < 500.0)) {
-                    mask.at<uchar>(v, u) = 255;
-                    mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
-                    cloud_full->points.push_back(pt);
-                }
+//            if ((pt.x > -9.0 && pt.x < 71.0) || (pt.x > 146.0 && pt.x < 226.0)) // segment 1 and 2
+            if (pt.x > 18.474-25.0 && pt.x < 18.474+25.0) // segment tree2
+                if (pt.y > 80.0 && pt.y < 120.0)
+                    if (pt.z > 8.0 && pt.z < 60.0) {
+                        mask.at<uchar>(v, u) = 255;
+                        mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
+                        cloud_full->points.push_back(pt);
+                    }
+//            if (pt.x > -45.0) // built
+//                if (pt.z > 30.0 &&  (pt.y > 10.0 && pt.y < 500.0)) {
+//                    mask.at<uchar>(v, u) = 255;
+//                    mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
+//                    cloud_full->points.push_back(pt);
+//                }
         }
     }
     Mat colorWithMask;
