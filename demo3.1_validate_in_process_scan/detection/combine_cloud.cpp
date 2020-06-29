@@ -22,15 +22,19 @@ pcl::PCDWriter writer;
 pcl::StatisticalOutlierRemoval<PointG> sor;
 
 int main(int argc, char **argv) {
-    int num_frames = 4;
+    if (argc != 3) {
+        cout << "please enter two file paths." << endl;
+        return -1;
+    }
+    
+    int num_frames = 2;
 
     PointCloudG clouds_full[num_frames];
     PointCloudG cloud_aligned (new pcl::PointCloud<PointG>);
     // load all the clouds
     for (int frame_index = 0; frame_index < num_frames; ++frame_index) {
         PointCloudG cloud(new pcl::PointCloud<PointG>);
-        boost::format fmt("../data3D/cloud_downsampled_%d.pcd");
-        reader.read((fmt % frame_index).str(), *cloud);
+        reader.read(argv[1+frame_index], *cloud);
         clouds_full[frame_index] = cloud;
     }
     cloud_aligned = clouds_full[0];

@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
         matsDepth[frame_index] = imread((boost::format("../data2D/depth_%d.png") % frame_index).str(), CV_LOAD_IMAGE_UNCHANGED);
 
     // read cylinder params
-    double **cylinder_params = readData("../construct3D_built/cylinder_params_2.txt");
+    double **cylinder_params = readData("../construct3D_built/cylinder_params.txt");
 
     Mat mask = Mat::zeros(matColor.size(), CV_8UC1);
     Mat mask_blue = Mat::zeros(matColor.size(), CV_8UC3);
@@ -204,9 +204,9 @@ int main(int argc, char **argv) {
                     << ((double)u - C.cx) * dis_average / C.fx, ((double)v - C.cy) * dis_average / C.fy, dis_average, 1.0);
             Mat p_o = tran_o2c * p_c;
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-//            double dis2cylinder = distance2cylinder(cylinder_params[POLE_INDEX], pt, SRART_PARAM, END_PARAM);
-//            if (dis2cylinder != 0 && abs(dis2cylinder) < 20.0 && pt.z > -15.0)
-            if (pt.x < -60.0 && pt.y < 30.0 && pt.z > 390.0) // built
+            double dis2cylinder = distance2cylinder(cylinder_params[POLE_INDEX], pt, SRART_PARAM, END_PARAM);
+            if (dis2cylinder != 0 && abs(dis2cylinder) < 5.0 && pt.z > -15.0)
+//            if (pt.x < -60.0 && pt.y < 30.0 && pt.z > 390.0) // built
             {
                 mask.at<uchar>(v, u) = 255;
                 mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
@@ -219,44 +219,44 @@ int main(int argc, char **argv) {
     Mat colorWithMask;
     matColor.copyTo(colorWithMask, mask);
 
-    // detect holes
+//    // detect holes
     vector<vector<Point> > contours;
     findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
     drawContours(matColor, contours, -1, Scalar(255, 0, 0));
-    cout << contours.size() << endl;
-    Rect2d rect = boundingRect(contours[0]);
-    Mat colorWithMaskRect =  matColor(rect);
-    cvtColor(colorWithMaskRect, colorWithMaskRect, CV_BGR2GRAY);
-    vector<Vec3f> circles;
-    HoughCircles(colorWithMaskRect, circles, CV_HOUGH_GRADIENT, 1.2, 10, 100, 15, 6, 12);
-    vector<PointCloudG> clouds_hole;
-    for (auto c : circles) {
-        cout << "hole found!" << endl;
-        circle(matColor, Point(c[0]+rect.x, c[1]+rect.y), c[2]*2, Scalar(0, 0, 255));
-        // add points on the circle to the clouds
-        vector<Point> points_on_circle;
-        ellipse2Poly(Point(c[0]+rect.x, c[1]+rect.y), Size(c[2]-2, c[2]-2), 0, 0, 360, 1, points_on_circle);
-        PointCloudG cloud_hole(new pcl::PointCloud<PointG>);
-        for (auto p : points_on_circle) {
-            double dis_average = 0.0;
-            bool use_frame = true;
-            for  (int frame_index = 0; frame_index < NUM_FRAMES; ++frame_index) {
-                double d = (double)matsDepth[frame_index].ptr<uint16_t>(p.y)[p.x] * 0.1; // unit: 0.1mm
-                if (d == 0.0) { use_frame = false; break;}
-                dis_average += d;
-            }
-            if (!use_frame) continue;
-            dis_average /= NUM_FRAMES;
-            // 3d reconstruction
-            if (dis_average == 0.0 || dis_average > 1500.0f) continue;
-            Mat p_c = (Mat_<double>(4, 1)
-                    << ((double)p.x - C.cx) * dis_average / C.fx, ((double)p.y - C.cy) * dis_average / C.fy, dis_average, 1.0);
-            Mat p_o = tran_o2c * p_c;
-            PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-            cloud_hole->points.push_back(pt);
-        }
-        clouds_hole.push_back(cloud_hole);
-    }
+//    cout << contours.size() << endl;
+//    Rect2d rect = boundingRect(contours[0]);
+//    Mat colorWithMaskRect =  matColor(rect);
+//    cvtColor(colorWithMaskRect, colorWithMaskRect, CV_BGR2GRAY);
+//    vector<Vec3f> circles;
+//    HoughCircles(colorWithMaskRect, circles, CV_HOUGH_GRADIENT, 1.2, 10, 100, 15, 6, 12);
+//    vector<PointCloudG> clouds_hole;
+//    for (auto c : circles) {
+//        cout << "hole found!" << endl;
+//        circle(matColor, Point(c[0]+rect.x, c[1]+rect.y), c[2]*2, Scalar(0, 0, 255));
+//        // add points on the circle to the clouds
+//        vector<Point> points_on_circle;
+//        ellipse2Poly(Point(c[0]+rect.x, c[1]+rect.y), Size(c[2]-2, c[2]-2), 0, 0, 360, 1, points_on_circle);
+//        PointCloudG cloud_hole(new pcl::PointCloud<PointG>);
+//        for (auto p : points_on_circle) {
+//            double dis_average = 0.0;
+//            bool use_frame = true;
+//            for  (int frame_index = 0; frame_index < NUM_FRAMES; ++frame_index) {
+//                double d = (double)matsDepth[frame_index].ptr<uint16_t>(p.y)[p.x] * 0.1; // unit: 0.1mm
+//                if (d == 0.0) { use_frame = false; break;}
+//                dis_average += d;
+//            }
+//            if (!use_frame) continue;
+//            dis_average /= NUM_FRAMES;
+//            // 3d reconstruction
+//            if (dis_average == 0.0 || dis_average > 1500.0f) continue;
+//            Mat p_c = (Mat_<double>(4, 1)
+//                    << ((double)p.x - C.cx) * dis_average / C.fx, ((double)p.y - C.cy) * dis_average / C.fy, dis_average, 1.0);
+//            Mat p_o = tran_o2c * p_c;
+//            PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
+//            cloud_hole->points.push_back(pt);
+//        }
+//        clouds_hole.push_back(cloud_hole);
+//    }
 
     addWeighted(matColor, 1.0, mask_blue, 0.4, 0.0, matColor);
     imshow("chessboard", matColor);
@@ -274,12 +274,12 @@ int main(int argc, char **argv) {
     writer.write("../data3D/cloud_passthrough.pcd", *cloud_full, false);
     cout << "PointCloud has: " << cloud_full->points.size() << " data points." << endl;
 
-    // save clouds_hole
-    for (int i = 0; i < clouds_hole.size(); ++i) {
-        clouds_hole[i]->width = clouds_hole[i]->points.size();
-        clouds_hole[i]->height = 1;
-        writer.write((boost::format("../data3D/circle_%d.pcd")%i).str(), *(clouds_hole[i]), false);
-    }
+//    // save clouds_hole
+//    for (int i = 0; i < clouds_hole.size(); ++i) {
+//        clouds_hole[i]->width = clouds_hole[i]->points.size();
+//        clouds_hole[i]->height = 1;
+//        writer.write((boost::format("../data3D/circle_%d.pcd")%i).str(), *(clouds_hole[i]), false);
+//    }
 
     return 0;
 }
