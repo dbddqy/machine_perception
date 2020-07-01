@@ -204,9 +204,13 @@ int main(int argc, char **argv) {
                     << ((double)u - C.cx) * dis_average / C.fx, ((double)v - C.cy) * dis_average / C.fy, dis_average, 1.0);
             Mat p_o = tran_o2c * p_c;
             PointG pt(p_o.at<double>(0, 0), p_o.at<double>(1, 0), p_o.at<double>(2, 0));
-            double dis2cylinder = distance2cylinder(cylinder_params[POLE_INDEX], pt, SRART_PARAM, END_PARAM);
-            if (dis2cylinder != 0 && abs(dis2cylinder) < 5.0 && pt.z > -15.0)
+//            double dis2cylinder = distance2cylinder(cylinder_params[POLE_INDEX], pt, SRART_PARAM, END_PARAM);
+//            if (dis2cylinder != 0 && abs(dis2cylinder) < 5.0 && pt.z > -15.0)
 //            if (pt.x < -60.0 && pt.y < 30.0 && pt.z > 390.0) // built
+            if ( (pt.x < 0.0 && pt.y < 0.0 && pt.z > 360.5 && pt.z < 380.5)
+                || (pt.x > 0.0 && pt.y < 0.0 && pt.z > 350.5 && pt.z < 358.5)
+                   || (pt.x > 0.0 && pt.y > 0.0 && pt.z > 370.5 && pt.z < 386.5)
+                      || (pt.x < 0.0 && pt.y > 0.0 && pt.z > 374.5 && pt.z < 382.5) ) // built 2
             {
                 mask.at<uchar>(v, u) = 255;
                 mask_blue.at<Vec3b>(v, u) = Vec3b(255, 0, 0);
