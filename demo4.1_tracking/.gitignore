@@ -5,6 +5,7 @@
 cmake-build-debug/
 hide/
 .idea/
+__pycache__/
 
 CMakeLists.txt.user
 CMakeCache.txt
