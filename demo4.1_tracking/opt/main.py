@@ -53,7 +53,7 @@ DISTANCE = 9.
 ANGLE_L = 30. * pi / 180.
 ANGLE_U = 150. * pi / 180.
 
-eq_cons = {"type": "eq", "fun": lambda x: dis_l_l(tran(x, l[0]), m) - l[0, 6] - m[6] - DISTANCE}
+eq_cons = {"type": "eq", "fun": lambda x: dis_l_l(tran(x, l[0]), m) - DISTANCE}
 ineq_cons = {"type": "ineq", "fun": lambda x: np.array([angle_l_l(tran(x, l[0]), m) - ANGLE_L
                                                           , - angle_l_l(tran(x, l[0]), m) + ANGLE_U])}
 
@@ -80,4 +80,4 @@ def cost(x):
 res = minimize(cost, x0, method="SLSQP", constraints=[eq_cons, ineq_cons], options={"fto1": 1e-9, "disp": True})
 print(res.x)
 
-np.savetxt("result.txt", res.x)
+np.savetxt("result.txt", res.x.reshape([1, 6]))
