@@ -26,3 +26,6 @@ target_link_libraries(main ${OpenCV_LIBS} ${realsense2_LIBRARY} ${CERES_LIBRARIE
 
 add_executable(demo_a_assembly demo_a_assembly.cpp)
 target_link_libraries(demo_a_assembly ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIBRARIES})
+
+add_executable(take_video take_video.cpp)
+target_link_libraries(take_video ${OpenCV_LIBS} ${realsense2_LIBRARY})
