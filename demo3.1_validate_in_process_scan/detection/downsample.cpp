@@ -29,16 +29,16 @@ int main(int argc, char **argv) {
 //    }
 
 //    double time_total = 0.0;
-    int num_frames = 32;
+    int num_frames = 1;
     for (int frame_index = 0; frame_index < num_frames; ++frame_index) {
-        PointCloudG cloud(new pcl::PointCloud<PointG>);
-        PointCloudG cloud_filtered(new pcl::PointCloud<PointG>);
+        PointCloudC cloud(new pcl::PointCloud<PointC>);
+        PointCloudC cloud_filtered(new pcl::PointCloud<PointC>);
         boost::format fmt("../data3D/cloud_full_%d.pcd");
         reader.read((fmt % frame_index).str(), *cloud);
 
-        pcl::VoxelGrid<PointG> sor;
+        pcl::VoxelGrid<PointC> sor;
         sor.setInputCloud(cloud);
-        float size = 2.0f;
+        float size = 4.0f;
         sor.setLeafSize(size, size, size);
 
 //        chrono::steady_clock::time_point t_start = chrono::steady_clock::now(); // timing start

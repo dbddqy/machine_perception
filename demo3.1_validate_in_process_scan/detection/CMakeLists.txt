@@ -48,6 +48,9 @@ target_link_libraries(takeFrame3D ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL_LIB
 add_executable(registerClouds registerClouds.cpp)
 target_link_libraries(registerClouds ${PCL_LIBRARIES})
 
+add_executable(registerExt registerExt.cpp)
+target_link_libraries(registerExt ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
 add_executable(ransac ransac.cpp)
 target_link_libraries(ransac ${PCL_LIBRARIES})
 

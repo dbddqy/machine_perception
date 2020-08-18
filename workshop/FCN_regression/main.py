@@ -88,11 +88,11 @@ if __name__ == "__main__":
     theta = {"w1": np.random.uniform(-1., 1., [50, 1]), "b1": np.zeros([50, 1])
              , "w2": np.random.uniform(-1., 1., [5, 50]), "b2": np.zeros([5, 1])
              , "w3": np.random.uniform(-1., 1., [1, 5]), "b3": np.zeros([1, 1])}
-    # plot original curve
-    y_plot = []
-    for value in x_train:
-        y_plot.append(model(value, theta)[3][0][0])
-    plt.plot(x_train, y_plot)
+    # # plot original curve
+    # y_plot = []
+    # for value in x_train:
+    #     y_plot.append(model(value, theta)[3][0][0])
+    # plt.plot(x_train, y_plot)
     # training
     theta_new = train(x_train, y_train, theta, model, lr=1e-3, steps=10000)
     # plot trained curve

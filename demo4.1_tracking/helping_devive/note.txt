@@ -1,0 +1,2 @@
+SanDisk 32G: Raspbien for Pi Zero W
+	ssh pi@192.168.179.118 password: 1234567
