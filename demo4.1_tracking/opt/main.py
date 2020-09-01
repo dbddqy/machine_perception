@@ -53,28 +53,42 @@ DISTANCE = 9.
 ANGLE_L = 30. * pi / 180.
 ANGLE_U = 150. * pi / 180.
 
-eq_cons = {"type": "eq", "fun": lambda x: dis_l_l(tran(x, l[0]), m) - DISTANCE}
-ineq_cons = {"type": "ineq", "fun": lambda x: np.array([angle_l_l(tran(x, l[0]), m) - ANGLE_L
-                                                          , - angle_l_l(tran(x, l[0]), m) + ANGLE_U])}
+num_cons = m.shape[0]
+# num_cons = 1
+
+if num_cons == 1:
+    eq_cons = {"type": "eq", "fun": lambda x: dis_l_l(tran(x, l[0]), m[0]) - DISTANCE}
+    ineq_cons = {"type": "ineq", "fun": lambda x: np.array([angle_l_l(tran(x, l[0]), m[0]) - ANGLE_L,
+                                                            - angle_l_l(tran(x, l[0]), m[0]) + ANGLE_U])}
+if num_cons == 2:
+    eq_cons = {"type": "eq", "fun": lambda x: np.array([dis_l_l(tran(x, l[0]), m[0]) - DISTANCE,
+                                                        dis_l_l(tran(x, l[1]), m[1]) - DISTANCE])}
+    ineq_cons = {"type": "ineq", "fun": lambda x: np.array([angle_l_l(tran(x, l[0]), m[0]) - ANGLE_L,
+                                                        - angle_l_l(tran(x, l[0]), m[0]) + ANGLE_U,
+                                                        angle_l_l(tran(x, l[1]), m[1]) - ANGLE_L,
+                                                        - angle_l_l(tran(x, l[1]), m[1]) + ANGLE_U])}
 
 # get initial guess
-l0_v = l[0][3:6]
-m_v = m[3:6]
+# x0 = np.zeros([6, ])
 
-cross = np.cross(l0_v, m_v)
-cross /= length(cross)
-cross *= (DISTANCE - dis_l_l(l[0], m))
-print(cross)
+# l0_v = l[0][3:6]
+# m_v = m[0][3:6]
+#
+# cross = np.cross(l0_v, m_v)
+# cross /= length(cross)
+# cross *= (DISTANCE - dis_l_l(l[0], m[0]))
+# print(cross)
 x0 = np.zeros([6, ])
-x0[3:6] = -cross
-
-print(dis_l_l(l[0], m) - DISTANCE)
-print(dis_l_l(tran(x0, l[0]), m) - DISTANCE)
+# x0[3:6] = -cross
+#
+# print(dis_l_l(l[0], m[0]) - DISTANCE)
+# print(dis_l_l(tran(x0, l[0]), m[0]) - DISTANCE)
 
 
 def cost(x):
     global l, t
-    return dis_l_t(tran(x, l[1]), t) ** 2
+    # return dis_l_t(tran(x, l[-1]), t) ** 2
+    return dis_l_t(tran(x, l[-1]), t) + 2.0 * length(x)
 
 
 res = minimize(cost, x0, method="SLSQP", constraints=[eq_cons, ineq_cons], options={"fto1": 1e-9, "disp": True})

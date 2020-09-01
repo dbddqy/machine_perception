@@ -2,6 +2,7 @@
 *.3dm.rhl
 *.stlbak
 
+marker/
 SLAM/
 .vscode/
 
