@@ -2,6 +2,8 @@ set(CMAKE_CXX_FLAGS "-std=c++14 -O3")
 cmake_minimum_required(VERSION 2.8.3)
 project(web)
 
+set(OpenCV_DIR /usr/local/include/opencv2)
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -204,15 +206,60 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-add_executable(web
-  src/web.cpp
+add_executable(rs_img_pub
+  src/rs_img_pub.cpp
 )
-add_dependencies(web ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(web
+add_dependencies(rs_img_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rs_img_pub
   ${catkin_LIBRARIES}
 )
 
+add_executable(f_assem
+  src/f_assem.cpp
+)
+add_dependencies(f_assem ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(f_assem
+  ${catkin_LIBRARIES}
+)
+
+add_executable(f_loc
+  src/f_loc.cpp
+)
+add_dependencies(f_loc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(f_loc
+  ${catkin_LIBRARIES}
+)
+
+add_executable(f_scan
+  src/f_scan.cpp
+)
+add_dependencies(f_scan ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(f_scan
+  ${catkin_LIBRARIES}
+)
+
+add_library(lib
+  src/lib.h
+  src/lib.cpp
+)
+add_dependencies(lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(lib
+  ${catkin_LIBRARIES}
+)
+
+find_package(Eigen3 REQUIRED)
+include_directories(${Eigen3_INCLUDE_DIRS})
+
 find_package(realsense2 REQUIRED)
-find_package(OpenCV REQUIRED)
+
+find_package(OpenCV 3.4.3 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-target_link_libraries(web ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
+find_package(yaml-cpp REQUIRED)
+
+target_link_libraries(lib ${OpenCV_LIBS} Eigen3::Eigen yaml-cpp)
+
+target_link_libraries(rs_img_pub lib ${OpenCV_LIBS} ${realsense2_LIBRARY})
+target_link_libraries(f_assem lib ${OpenCV_LIBS} Eigen3::Eigen yaml-cpp)
+target_link_libraries(f_loc lib ${OpenCV_LIBS} Eigen3::Eigen yaml-cpp)
+target_link_libraries(f_scan lib ${OpenCV_LIBS} Eigen3::Eigen yaml-cpp)

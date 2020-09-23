@@ -1,0 +1,16 @@
+f_state: 0
+draw_index: 0
+relocate: false
+keep_relocate: false
+c2w:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+
+# assembly relted
+monitor_start: 150.0 # in mm
+monitor_gap: 10.0 # in mm
+monitor_count: 15

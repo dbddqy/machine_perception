@@ -16,7 +16,7 @@ using namespace std;
 using namespace cv;
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "web_image_publisher");
+    ros::init(argc, argv, "rs_img_pub");
     ros::NodeHandle nh;
 
     string path = ros::package::getPath("web") + "/cfg/high_accuracy_config.json";
@@ -63,18 +63,25 @@ int main(int argc, char** argv) {
     // end realsense
     // =============
 
-    image_transport::ImageTransport it(nh);
-    image_transport::Publisher pub = it.advertise("img", 1);
+    image_transport::ImageTransport it_color(nh);
+    image_transport::Publisher pub_color = it_color.advertise("rs_color", 1);
+    image_transport::ImageTransport it_depth(nh);
+    image_transport::Publisher pub_cepth = it_depth.advertise("rs_depth", 1);
 
     ros::Rate rate(10);
     while (nh.ok()) {
         rs2::frameset frameset = pipe.wait_for_frames();
+        frameset = align_to_color.process(frameset);
         auto color = frameset.get_color_frame();
+        auto depth = frameset.get_depth_frame();
         Mat matColor(Size(1920, 1080), CV_8UC3, (void*)color.get_data(), Mat::AUTO_STEP);
-        cv::resize(matColor, matColor, Size(960, 540));
-        sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", matColor).toImageMsg();
+        Mat matDepth(Size(1920, 1080), CV_16U, (void*)depth.get_data(), Mat::AUTO_STEP);
+        // cv::resize(matColor, matColor, Size(960, 540));
+        sensor_msgs::ImagePtr msg_color = cv_bridge::CvImage(std_msgs::Header(), "bgr8", matColor).toImageMsg();
+        sensor_msgs::ImagePtr msg_depth = cv_bridge::CvImage(std_msgs::Header(), "mono16", matDepth).toImageMsg();
+        pub_color.publish(msg_color);
+        pub_cepth.publish(msg_depth);
 
-        pub.publish(msg);
         ros::spinOnce();
         rate.sleep();
     }

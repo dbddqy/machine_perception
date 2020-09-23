@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>EASY ASSEMBLY</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- 和ROS交互部分 -->
+
+<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+<script src="ros.js"></script>
+
+
+<!--全局Style设定-->
+<link rel="stylesheet" href="style.css">
+<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Architects Daughter' rel='stylesheet'>
+<style>
+* {box-sizing: border-box;}
+/* Style the fonts */
+body, .tab button, .btn {font-family: Abel, Arial, Helvetica Neue, Helvetica, sans-serif;}
+</style>
+</head>
+
+
+<!--Body 部分-->
+<body>
+
+<!--script for showing current progress-->
+  <script>
+    function showProgress(id_p, id_u) {
+      document.getElementById(id_p).innerHTML = "Current Progress: " + (UNIT_INDEX*100/(UNIT_MAX+1)).toFixed(2) + "%" +
+                       "&nbsp;&nbsp;&nbsp;&nbsp; Current element to assemble: " + UNIT_INDEX;
+      // document.getElementById(id_u).innerHTML = UNIT_INDEX + " of " + (UNIT_MAX+1) + " units finished";
+    }
+  </script>
+
+  <!--定义Tab栏-->
+  <div class="tab">
+    <button class="tablinks" onclick="openTag(event, 'Home');showProgress('progress_1','unit_1')" id="defaultOpen">Home</button>
+    <button class="dropdown-btn tablinks" onclick = "openTag(event, 'Localization');showProgress('progress_2','unit_2')" >Localization <a class="fa-caret-down">&#128899;</a></button>
+      <div class="dropdown-container">
+        <button class="tablinks" onclick = "openTag(event, 'Calibrate_Markers');showProgress('progress_3','unit_3');switch_state(1)">Calibrate Markers</button>
+        <button class="tablinks" onclick = "openTag(event, 'Camera_Localization');showProgress('progress_4','unit_4');switch_state(2)">Camera Localization</button>
+      </div>
+    <button class="dropdown-btn tablinks" onclick = "openTag(event, 'Scan');showProgress('progress_5','unit_5')">Scan <a class="fa-caret-down">&#128899;</a></button>
+      <div class="dropdown-container">
+        <button class="tablinks" onclick = "openTag(event, 'Scan_Material');showProgress('progress_6','unit_6');switch_state(3)">Scan Material</button>
+        <button class="tablinks" onclick = "openTag(event, 'Scan_Global_Structure');showProgress('progress_7','unit_7');switch_state(4)">Scan Structure</button>
+      </div>
+    <button class="tablinks" onclick = "openTag(event, 'Assembly');showProgress('progress_8','unit_8');switch_state(5)">Assembly</button>
+    <button class="tablinks" onclick = "openTag(event, 'Show_Deviation');showProgress('progress_9','unit_9');switch_state(6)">Show Deviation</button>
+  </div>
+
+
+  <!--定义System Log栏-->
+  <div class="systemLog">
+    <h3 align="center">System Log</h3>
+    <p id="log"> Check system log here.</p>
+
+    <!--待解决问题: 读取外部传入变量-->
+    <script>
+    var a="[INFO] Welcome to easy assembly.</br>[INFO] Please calibrate your markers first.</br>[INFO] Marker calibration finished.</br>[INFO] Localizing Camera...</br> [INFO] Camera localized.";
+    document.getElementById("log").innerHTML = a;
+    </script>
+  </div>
+
+
+  <!--定义对应各个Tab标签的页面内容-->
+  <div id="Home" class="tabcontent" align="center">
+    <h1 id="progress_1">Current Progress</h1>
+    <h2 id="unit_1"></h2>
+  </div>
+
+  <div id="Localization" class="tabcontent" align="center">
+    <h1 id="progress_2">Progress</h1>
+    <h2 id="unit_2"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span>Calibrate Markers / Localize Camera</span>
+    <br/><br/>
+  </div>
+
+  <div id="Calibrate_Markers" class="tabcontent" align="center">
+    <h1 id="progress_3">Progress</h1>
+    <h2 id="unit_3"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span>Press the button to calibrate markers</span>
+    <br/><br/>
+    <button class="btn orange" onclick = "save_image();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "perform_task();showExecuted()" >Perform Calibration</button>
+  </div>
+
+  <div id="Camera_Localization" class="tabcontent" align="center">
+    <h1 id="progress_4">Progress</h1>
+    <h2 id="unit_4"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span id="locText">Press the button to start camera localization</span>
+    <br/><br/>
+    <button class="btn orangeSpecial" onclick = "changeButtonState(event)" id="locStateBtn">Start Localization</button>
+  </div>
+
+  <script>
+    function changeButtonState(evt){
+      var locText = document.getElementById("locText");
+      var btnText = document.getElementById("locStateBtn");
+
+      if (btnText.innerHTML === "Start Localization"){
+        locText.innerHTML = "Press the button to cancel camera localization";
+        btnText.innerHTML = "Cancel Localization";
+        evt.currentTarget.className += " active";
+        keep_relocate(true);
+      }else{
+        locText.innerHTML = "Press the button to start camera localization";
+        btnText.innerHTML = "Start Localization";
+        evt.currentTarget.className = evt.currentTarget.className.replace(" active", "");
+        keep_relocate(false);
+      }
+      
+    }
+  </script>
+
+  <div id="Scan" class="tabcontent" align="center">
+    <h1 id="progress_5">Progress</h1>
+    <h2 id="unit_5"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span>Scan Material / Scan Global Structure</span>
+    <br/><br/>
+  </div>
+
+  <div id="Scan_Material" class="tabcontent" align="center">
+    <h1 id="progress_6">Progress</h1>
+    <h2 id="unit_6"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span>Press the button to scan material</span>
+    <br/><br/>
+    <button class="btn orange" onclick = "save_image();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "perform_task();showExecuted()" >Perform Scan Process</button>
+  </div>
+
+  <div id="Scan_Global_Structure" class="tabcontent" align="center">
+    <h1 id="progress_7">Progress</h1>
+    <h2 id="unit_7"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span >Press the button to scan structure</span>
+    <br/><br/>
+    <button class="btn orange" onclick = "save_image();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "perform_task();showExecuted()" >Perform Scan Process</button>
+  </div>
+
+  <div id="Assembly" class="tabcontent" align="center">
+    <h1 id="progress_8">Progress</h1>
+    <h2 id="unit_8"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span id="deviation">Average deviation of monitored points: </span>
+    <br /><br />
+    <button class="btn orange" onclick = "previous();showProgress('progress_8','unit_8')" >&#10094; &#10094; Previous</button>
+    <button class="btn orange" onclick = "next();showProgress('progress_8','unit_8')">Next &#10095; &#10095;</button>
+    <br />
+  </div>
+
+  <div id="Show_Deviation" class="tabcontent" align="center">
+    <h1 id="progress_9">Progress</h1>
+    <h2 id="unit_9"></h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <span>Current Deviation Visualization</span>
+  </div>
+
+  <!--定义snackbar显示提示信息-->
+  <div id="snackbar_saved">Image saved!</div>
+  <div id="snackbar_executed">Successfully executed!</div>
+
+  <!--script for dropdown-btn-->
+  <script>
+  /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+  var dropdown = document.getElementsByClassName("dropdown-btn");
+  var i;
+
+  for (i = 0; i < dropdown.length; i++) {
+    dropdown[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.display === "block") {
+    dropdownContent.style.display = "none";
+    } else {
+    dropdownContent.style.display = "block";
+    }
+    });
+  }
+  </script>
+
+  <!--script for opening the tag-->
+  <script>
+  function openTag(evt, tagName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tagName).style.display = "block";
+    evt.currentTarget.className += " active";
+    console.log('tag button pressed:', tagName);
+  }
+
+  // Get the element with id="defaultOpen" and click on it
+  document.getElementById("defaultOpen").click();
+  </script>
+
+  <!--script for snackbar-->
+
+  <script>
+  function showSaved() {
+    var x = document.getElementById("snackbar_saved");
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+  }
+  function showExecuted() {
+    var x = document.getElementById("snackbar_executed");
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+  }
+  </script>
+
+</body>
+</html>

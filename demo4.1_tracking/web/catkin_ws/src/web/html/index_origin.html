@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>EASY ASSEMBLY</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- 和ROS交互部分 -->
+
+<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+<script type="text/javascript" type="text/javascript">
+  // Connecting to ROS
+  var ros = new ROSLIB.Ros({
+    url : 'ws://192.168.179.107:9090'
+  });
+
+  //判断是否连接成功并输出相应的提示消息到web控制台
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+  });
+
+  ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+  });
+
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+  });
+
+  // Publishing a Topic
+  var cmdVel = new ROSLIB.Topic({
+    ros : ros,
+    name : '/cmd_vel',
+    messageType : 'geometry_msgs/Twist'
+  });//创建一个topic,它的名字是'/cmd_vel',,消息类型是'geometry_msgs/Twist'
+
+  var twist = new ROSLIB.Message({
+    linear : {
+      x : 0.1,
+      y : 0.2,
+      z : 0.3
+    },
+    angular : {
+      x : -0.1,
+      y : -0.2,
+      z : -0.3
+    }
+  });//创建一个message
+
+  function func()//在点击”Publish”按钮后发布消息，并对消息进行更改
+  {
+    console.log('menu button pressed');
+    cmdVel.publish(twist);//发布twist消息
+    twist.linear.x = twist.linear.x + 0.1;
+    twist.linear.y = twist.linear.y + 0.1;
+    twist.linear.z = twist.linear.z + 0.1;
+    twist.angular.x = twist.angular.x + 0.1;
+    twist.angular.y = twist.angular.y + 0.1;
+    twist.angular.z = twist.angular.z + 0.1;
+  }
+
+  // Subscribing to a Topic
+  var listener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/chatter',
+    messageType : 'std_msgs/String'
+  });//创建一个topic,它的名字是'/chatter',,消息类型是'std_msgs/String'
+
+  function subscribe()//在点击”Subscribe”按钮后订阅'/chatter'的消息，并将其显示到网页中
+  {
+     console.log('previous button pressed');
+     listener.subscribe(function(message) {
+       document.getElementById("output").innerHTML = ('Received message on ' + listener.name + ': ' + message.data);
+     });
+  }
+
+  function unsubscribe()//在点击”Unsubscribe”按钮后取消订阅'/chatter'的消息
+  {
+     console.log('next button pressed');
+     listener.unsubscribe();
+  }
+</script>
+
+
+<!--全局Style设定-->
+<link rel="stylesheet" href="style.css">
+<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Architects Daughter' rel='stylesheet'>
+<style>
+* {box-sizing: border-box;}
+/* Style the fonts */
+body, .tab button, .btn {font-family: Abel, Arial, Helvetica Neue, Helvetica, sans-serif;}
+</style>
+</head>
+
+
+<!--Body 部分-->
+<body>
+  <!--定义Tab栏-->
+  <div class="tab">
+    <button class="tablinks" onclick="openTag(event, 'Home');showProgress('progress_1','unit_1')" id="defaultOpen">Home</button>
+    <button class="dropdown-btn tablinks" onclick = "openTag(event, 'Localization');showProgress('progress_2','unit_2')" >Localization <a class="fa-caret-down">&#128899;</a></button>
+      <div class="dropdown-container">
+        <button class="tablinks" onclick = "openTag(event, 'Calibrate_Markers');showProgress('progress_3','unit_3')">Calibrate Markers</button>
+        <button class="tablinks" onclick = "openTag(event, 'Camera_Localization');showProgress('progress_4','unit_4')">Camera Localization</button>
+      </div>
+    <button class="dropdown-btn tablinks" onclick = "openTag(event, 'Scan');showProgress('progress_5','unit_5')">Scan <a class="fa-caret-down">&#128899;</a></button>
+      <div class="dropdown-container">
+        <button class="tablinks" onclick = "openTag(event, 'Scan_Material');showProgress('progress_6','unit_6')">Scan Material</button>
+        <button class="tablinks" onclick = "openTag(event, 'Scan_Global_Structure');showProgress('progress_7','unit_7')">Scan Global Structure</button>
+      </div>
+    <button class="tablinks" onclick = "openTag(event, 'Assembly');showProgress('progress_8','unit_8')">Assembly</button>
+    <button class="tablinks" onclick = "openTag(event, 'Show_Deviation');showProgress('progress_9','unit_9')">Show Deviation</button>
+  </div>
+
+
+  <!--定义System Log栏-->
+  <div class="systemLog">
+    <h3 align="center">System Log</h3>
+    <p id="log"> Check system log here.</p>
+
+    <!--待解决问题: 读取外部传入变量-->
+    <script>
+    var a="Welcome to easy assembly.</br>Please calibrate your markers first.</br>Marker calibration finished.</br>Localizing Camera...</br> Camera localized.";
+    document.getElementById("log").innerHTML = a;
+    </script>
+  </div>
+
+
+  <!--定义对应各个Tab标签的页面内容-->
+  <div id="Home" class="tabcontent" align="center">
+    <h1 id="progress_1">Current Progress</h1>
+    <h2 id="unit_1">Units Finished</h2>
+  </div>
+
+  <div id="Localization" class="tabcontent" align="center">
+    <h1 id="progress_2">Progress</h1>
+    <h2 id="unit_2">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3>Calibrate Markers / Localize Camera</h3>
+  </div>
+
+  <div id="Calibrate_Markers" class="tabcontent" align="center">
+    <h1 id="progress_3">Progress</h1>
+    <h2 id="unit_3">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3>Press the button to calibrate markers</h3>
+    <button class="btn orange" onclick = "subscribe();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "subscribe();showExecuted()" >Perform Calibration</button>
+  </div>
+
+  <div id="Camera_Localization" class="tabcontent" align="center">
+    <h1 id="progress_4">Progress</h1>
+    <h2 id="unit_4">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3 id="locText">Press the button to start camera localization</h3>
+    <button class="btn orangeSpecial" onclick = "subscribe();changeButtonState(event)" id="locStateBtn">Start Localization</button>
+  </div>
+
+  <script>
+    function changeButtonState(evt){
+      var locText = document.getElementById("locText");
+      var btnText = document.getElementById("locStateBtn");
+
+      if (btnText.innerHTML === "Start Localization"){
+        locText.innerHTML = "Press the button to cancel camera localization";
+        btnText.innerHTML = "Cancel Localization";
+        evt.currentTarget.className += " active";
+      }else{
+        locText.innerHTML = "Press the button to start camera localization";
+        btnText.innerHTML = "Start Localization";
+        evt.currentTarget.className = evt.currentTarget.className.replace(" active", "");
+      }
+    }
+  </script>
+
+  <div id="Scan" class="tabcontent" align="center">
+    <h1 id="progress_5">Progress</h1>
+    <h2 id="unit_5">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3>Scan Material / Scan Global Structure</h3>
+  </div>
+
+  <div id="Scan_Material" class="tabcontent" align="center">
+    <h1 id="progress_6">Progress</h1>
+    <h2 id="unit_6">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3>Press the button to scan material</h3>
+    <button class="btn orange" onclick = "subscribe();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "subscribe();showExecuted()" >Perform Scan Process</button>
+  </div>
+
+  <div id="Scan_Global_Structure" class="tabcontent" align="center">
+    <h1 id="progress_7">Progress</h1>
+    <h2 id="unit_7">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3 >Press the button to scan global structure</h3>
+    <button class="btn orange" onclick = "subscribe();showSaved()" >Save Image</button>
+    <button class="btn orange" onclick = "subscribe();showExecuted()" >Perform Scan Process</button>
+  </div>
+
+  <div id="Assembly" class="tabcontent" align="center">
+    <h1 id="progress_8">Progress</h1>
+    <h2 id="unit_8">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <p id = "output"></p>
+    <h3 >Press the button to choose element to assemble</h3>
+    <button class="btn orange" onclick = "subscribe()" >&#10094; &#10094; Previous</button>
+    <button class="btn orange" onclick = "unsubscribe()">Next &#10095; &#10095;</button>
+    <br />
+  </div>
+
+  <div id="Show_Deviation" class="tabcontent" align="center">
+    <h1 id="progress_9">Progress</h1>
+    <h2 id="unit_9">Units</h2>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h3>Current Deviation Visualization</h3>
+  </div>
+
+  <!--定义snackbar显示提示信息-->
+  <div id="snackbar_saved">Image saved!</div>
+  <div id="snackbar_executed">Successfully executed!</div>
+
+  <!--script for dropdown-btn-->
+  <script>
+  /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+  var dropdown = document.getElementsByClassName("dropdown-btn");
+  var i;
+
+  for (i = 0; i < dropdown.length; i++) {
+    dropdown[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.display === "block") {
+    dropdownContent.style.display = "none";
+    } else {
+    dropdownContent.style.display = "block";
+    }
+    });
+  }
+  </script>
+
+  <!--script for opening the tag-->
+  <script>
+  function openTag(evt, tagName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tagName).style.display = "block";
+    evt.currentTarget.className += " active";
+    console.log('tag button pressed:', tagName);
+  }
+
+  // Get the element with id="defaultOpen" and click on it
+  document.getElementById("defaultOpen").click();
+  </script>
+
+  <!--script for snackbar-->
+
+  <script>
+  function showSaved() {
+    var x = document.getElementById("snackbar_saved");
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+  }
+  function showExecuted() {
+    var x = document.getElementById("snackbar_executed");
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+  }
+  </script>
+
+
+<!--script for showing current progress-->
+  <script>
+    function showProgress(id_p, id_u) {
+      var a = "xx%";
+      document.getElementById(id_p).innerHTML = "Current Progress: " + a;
+      var b = "0";
+      var c = "75";
+      document.getElementById(id_u).innerHTML = b + " of " + c + " units finished";
+    }
+  </script>
+
+
+</body>
+</html>

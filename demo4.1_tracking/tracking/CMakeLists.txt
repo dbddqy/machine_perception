@@ -29,3 +29,6 @@ target_link_libraries(demo_a_assembly ${OpenCV_LIBS} ${realsense2_LIBRARY} ${PCL
 
 add_executable(take_video take_video.cpp)
 target_link_libraries(take_video ${OpenCV_LIBS} ${realsense2_LIBRARY})
+
+add_executable(test_aruco test_aruco.cpp)
+target_link_libraries(test_aruco ${OpenCV_LIBS} ${realsense2_LIBRARY} Eigen3::Eigen)

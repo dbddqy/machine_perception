@@ -1,0 +1,17 @@
+<launch>
+  <rosparam file="$(find web)/cfg/web_param.yaml" command="load"/>
+
+  <!--<param name="f_state" value="0"/>
+  <param name="draw_index" value="0"/>
+  <param name="localize" value="false"/>
+  <param name="c2w" type="list" value="0.0 0.0 0.0 0.0 0.0 0.0"/>-->
+
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+  <node name="web_video_server" pkg="web_video_server" type="web_video_server"/>
+
+  <node name="rs_img_pub" pkg="web" type="rs_img_pub"/>
+  <!--<node name="f_assemble" pkg="web" type="f_assem"/>
+  <node name="f_loc" pkg="web" type="f_loc"/>-->
+  <node name="f_scan" pkg="web" type="f_scan"/>
+
+</launch>

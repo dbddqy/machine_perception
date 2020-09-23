@@ -1,0 +1,5 @@
+# marker
+num_markers: 7
+marker_size: 0.07682  # size in meter
+reorder: true
+reorder_indices_list: [0, 1, 2, 3, 4, 5, 7]

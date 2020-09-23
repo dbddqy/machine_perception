@@ -1,0 +1,266 @@
+/* Style the tab */
+.tab {
+  float: left;
+  border: 0px solid #ffffff;
+  background-color: #272727;
+  width: 15%;
+  height: 750px;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  .tab {
+  float: left;
+  border: 2px solid #ffffff;
+  background-color: #272727;
+  width: 20%;
+  height: 275px;
+  }
+}
+
+/* Style the buttons inside the tab */
+.tab button, .dropdown-btn {
+  display: block;
+  background-color: inherit;
+  color: white;
+  padding: 30px 16px;
+  width: 100%;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  .tab button, .dropdown-btn {
+  display: block;
+  background-color: inherit;
+  color: white;
+  padding: 5px 2px;
+  width: 100%;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 12px;
+  }
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover, .dropdown-btn:hover {
+  /*background-color: #ddd;*/
+  background-color: #F5CBA7;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  /*background-color: #7B7D7D;*/
+  background-color: #ff652f;
+  border: 2px solid orange;
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  padding: 0px 0px;
+  border: 0px solid #ffffff;
+  background-color: #000000;
+  width: 70%;
+  border-left: none;
+  height: 750px;
+  background-image: url("http://192.168.179.103:8080/stream?topic=/img&type=mjpeg&quality=30&width=960&height=540");
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: center;
+  display: none;
+  color: white;
+}
+
+.tabcontent span {
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 24px;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  .tabcontent {
+  float: left;
+  padding: 0px 12px;
+  border: 2px solid #ffffff;
+  background-color: #000000;
+  width: 60%;
+  border-left: none;
+  height: 275px;
+  background-image: url("image/background_placeholder.jpg");
+  background-size: 100%;
+  display: none;
+  color: white;
+  }
+  .tabcontent h2{
+    font-size: 12px;
+  }
+}
+
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+  display: none;
+  background-color: #7B7D7D;
+  padding-left: 0px;
+}
+
+/* Optional: Style the caret down icon */
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
+
+/* Style the system log */
+.systemLog{
+  float: right;
+  padding: 0px 12px;
+  color: white;
+  border: 0px solid #ffffff;
+  background-color: #272727;
+  width: 15%;
+  border-left: none;
+  height: 750px;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  .systemLog{
+  float: right;
+  padding: 0px 12px;
+  color: white;
+  border: 2px solid #ffffff;
+  background-color: #272727;
+  width: 20%;
+  border-left: none;
+  height: 275px;
+  word-break: break-all;
+  word-wrap: break-word;
+  }
+  .systemLog h3{
+    font-size: 12px;
+  }
+  .systemLog p{
+    font-size: 8px;
+  }
+}
+
+/* Style the button on tabcontent page*/
+.btn {
+  border: 2px solid orange;
+  border-radius: 5px;
+  background-color: white;
+  color: black;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  .btn {
+  border: 2px solid orange;
+  border-radius: 5px;
+  background-color: white;
+  color: black;
+  padding: 8px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  }
+}
+
+.btn:hover{
+  background-color: rgba(255,101,47,1.0);
+}
+
+/* Orange */
+.orange {
+  border-color: orange;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+}
+
+.orangeSpecial {
+  border-color: orange;
+  background-color: rgba(255,101,47,0.0);
+  color: white;
+}
+
+.orangeSpecial.active{
+  background-color: #ff652f;
+  border: 2px solid orange;
+}
+
+/* Style the footer */
+footer {
+  background-color: #ffffff;
+  padding: 20px;
+  font-size: 10px;
+  text-align: center;
+  color: #A6ACAF;
+  height: 10%;
+}
+
+/* Responsive Rules*/
+@media screen and (max-height: 750px){
+  footer {
+  background-color: #ffffff;
+  padding: 5px;
+  font-size: 6px;
+  text-align: center;
+  color: #A6ACAF;
+  height: 10%;
+  }
+}
+
+/* Style the snackbar for popping up messages*/
+#snackbar_saved, #snackbar_executed {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 50%;
+  font-size: 17px;
+}
+
+#snackbar_saved.show, #snackbar_executed.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 1.5s;
+  animation: fadein 0.5s, fadeout 0.5s 1.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 50%; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 50%; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 50%; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 50%; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
