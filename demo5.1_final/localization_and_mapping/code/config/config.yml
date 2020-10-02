@@ -1,0 +1,11 @@
+# camera
+width: 1920
+height: 1080
+ppx: 9.6591498e+02
+ppy: 5.4094659e+02
+fx: 1.3821929e+03
+fy: 1.3783481e+03
+coeffs: [0., 0., 0., 0., 0.]
+
+# aruco markers
+marker_size: 0.07681882  # size in meter

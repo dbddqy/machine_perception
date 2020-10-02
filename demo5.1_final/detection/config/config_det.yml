@@ -1,0 +1,51 @@
+# task type
+# SCAN_MATERIAL 0
+# SCAN_BUILT 1
+task_type: 1
+task_index: 5
+num_poles: 37
+
+# task node type
+# NODE_FROM 0
+# NODE_TO 1
+task_node_type: 0
+
+# path
+path_img: "../../data2D/"
+path_design: "../../../data/design/design.txt"
+path_design_m: "../../../data/design/design_m.txt"  # for scanning the material
+path_topo: "../../../data/design/design_seg.txt"
+path_w2k: "../../../data/localization_and_mapping/w2k.txt"
+path_cloud: "../../data3D/"
+path_result: "../../../data/detection/"
+
+# marker
+num_photos: 9
+num_markers: 7
+marker_size: 0.07681882  # size in meter
+reorder: true
+reorder_indices_list: [0, 1, 2, 3, 4, 5, 7]
+
+# corner_refinement
+# CORNER_REFINE_NONE: 0
+# CORNER_REFINE_SUBPIX: 1
+# CORNER_REFINE_CONTOUR: 2
+# CORNER_REFINE_APRILTAG: 3
+corner_refinement: 3
+view_corner: false
+
+# segmentation
+seg_param: 0.24  # size in meter
+seg_length: 0.04  # size in meter
+# depth value larger than "dis_max" will be ignored
+dis_max: 2.0  # size in meter
+# distance from 3d point to design axis larger than "seg_thresh" are outliers
+seg_thresh: 0.005  # size in meter
+
+# cloud processing
+leaf_size: 0.002  # size in meter
+mean_k: 8  # for statistical outlier removal
+
+# cylinder fitting
+radius: 0.0097  # size in meter
+fit_thresh: 0.1  # size in meter

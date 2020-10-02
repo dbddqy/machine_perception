@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 3.15)
 # include packages
 # =========================
 
+find_package(yaml-cpp REQUIRED)
+
 find_package(realsense2 REQUIRED)
 
 find_package(OpenCV REQUIRED)
@@ -28,4 +30,4 @@ add_definitions(${PCL_DEFINITIONS})
 # =========================
 
 add_subdirectory(lib)
-add_subdirectory(src)
+add_subdirectory(app)

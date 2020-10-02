@@ -1,0 +1,17 @@
+# task
+task_index: 8
+
+# path
+path_topo: "../data/design/design_seg.txt"
+path_m: "../data/detection/result_m_%d_%d.txt"
+path_b: "../data/detection/result_b_%d_%d.txt"
+path_t: "../data/design/design_targets.txt"
+path_result: "../data/adaptation/result_%d.txt"
+
+# constraint:
+distance: 0.01  # in meter
+angle_l: 20.0  # in degree
+angle_u: 160.0  # in degree
+
+# optimization
+mu: 2.0
