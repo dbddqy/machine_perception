@@ -16,8 +16,8 @@ target_link_libraries(take_frame ${LIB_RS_DEP} ${LIB_DET_DEP})
 add_executable(detect detect.cpp)
 target_link_libraries(detect ${LIB_DET_DEP})
 
-add_executable(test test.cpp)
-target_link_libraries(test ${LIB_CAMERA_DEP})
+#add_executable(test test.cpp)
+#target_link_libraries(test ${LIB_CAMERA_DEP})
 
 add_executable(assemble assemble.cpp)
 target_link_libraries(assemble ${LIB_DET_DEP})

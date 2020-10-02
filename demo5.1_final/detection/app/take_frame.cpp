@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
     D415 d415;
     d415.print_intrinsics();
     Mat color, depth;
+    namedWindow("color", CV_WINDOW_NORMAL);
+    cvResizeWindow("color", 960, 540);
     boost::format file_color(path_img + "color_%d.png");
     boost::format file_depth(path_img + "depth_%d.png");
     boost::format file_color_drawn(path_img + "color_drawn_%d.png");
