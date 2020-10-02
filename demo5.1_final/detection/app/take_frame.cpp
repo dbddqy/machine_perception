@@ -35,13 +35,14 @@ int main(int argc, char **argv) {
         Mat color_drawn = color.clone();
         vector< vector<Point2f> > corners;
         vector<int> ids;
-        det::detectMarker(color_drawn, corners, ids, 0.07, true, cv::aruco::CORNER_REFINE_SUBPIX);
+        det::detectMarker(color_drawn, corners, ids, 0.07, true, cv::aruco::CORNER_REFINE_NONE);
         imshow("color", color_drawn);
 
         if (key == 's') {
             imwrite((file_color % num_saved).str(), color);
             imwrite((file_depth % num_saved).str(), depth);
             imwrite((file_color_drawn % num_saved).str(), color_drawn);
+            cout << "frame " << num_saved << " saved!" << endl;
             ++ num_saved;
         }
     }

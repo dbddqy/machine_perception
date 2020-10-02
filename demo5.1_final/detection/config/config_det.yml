@@ -1,14 +1,14 @@
 # task type
 # SCAN_MATERIAL 0
 # SCAN_BUILT 1
-task_type: 1
-task_index: 5
+task_type: 0
+task_index: 4
 num_poles: 37
 
 # task node type
 # NODE_FROM 0
 # NODE_TO 1
-task_node_type: 0
+task_node_type: 1
 
 # path
 path_img: "../../data2D/"
@@ -35,7 +35,7 @@ corner_refinement: 3
 view_corner: false
 
 # segmentation
-seg_param: 0.24  # size in meter
+#seg_param: 0.24  # size in meter
 seg_length: 0.04  # size in meter
 # depth value larger than "dis_max" will be ignored
 dis_max: 2.0  # size in meter

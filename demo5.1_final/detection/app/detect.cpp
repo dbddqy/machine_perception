@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     // cloud processing
     auto leaf_size = config["leaf_size"].as<float>();
     auto radius = config["radius"].as<float>();
-    auto fit_thresh = config["fit_thresh"].as<float>();
+//    auto fit_thresh = config["fit_thresh"].as<float>();
     auto mean_k = config["mean_k"].as<int>();
 
     /* ===============
@@ -90,11 +90,12 @@ int main(int argc, char **argv) {
             seg_param = data_topo[task_index][TOPO_FROM_M_PARAM];
             target_index = (int)data_topo[task_index][TOPO_FROM_INDEX];
         } else {
-            target_index = (int)data_topo[task_index][TOPO_TO_INDEX];
-            if (data_topo[task_index][TOPO_TYPE] == 0.0)
+            if (data_topo[task_index][TOPO_TYPE] == 0.0) {
                 seg_param = Eigen::Vector3d(pole[4], pole[5], pole[6]).norm()- 0.5 * seg_length;
-            else
+            } else {
                 seg_param = data_topo[task_index][TOPO_TO_M_PARAM];
+                target_index = (int)data_topo[task_index][TOPO_TO_INDEX];
+            }
         }
     } else if (task_node_type == det::NODE_FROM) {
         pole = Cylinder(data_design[(int)data_topo[task_index][TOPO_FROM_INDEX]]);
