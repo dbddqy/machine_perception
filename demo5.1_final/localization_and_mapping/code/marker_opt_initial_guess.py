@@ -11,8 +11,9 @@ with open("config/config_marker.yml", 'r') as file:
 
 n = conf["num_photos"]   # number of photos
 m = conf["num_markers"]  # number of  markers
-path_img = conf["path_img"] + "marker_%d.png"
+path_img = conf["path_img"] + "color_%d.png"
 path_result = conf["path_result"]
+corner_refinement = conf["corner_refinement"]
 if conf["reorder"]:
     indices = conf["reorder_indices_list"]
 else:
@@ -33,8 +34,11 @@ w2k = [np.eye(4)]*m
 #                        np.array([6.33976050e-04, 3.89877312e-01, -5.58933275e-03]))
 
 for i in range(1, m):
+    print ("m = %d" % i)
     for j in range(n):
         color = cv2.imread(path_img % j)
+        param = cv2.aruco.DetectorParameters_create()
+        param.cornerRefinementMethod = corner_refinement
         corners, ids, _ = cv2.aruco.detectMarkers(color, d415.aruco_dict)
         # check if it contains i-th marker
         contain_i = False
@@ -52,6 +56,7 @@ for i in range(1, m):
             if ids[k, 0] in indices[0:i]:
                 contain_know = True
                 c2k_k = rs.get_c2k(color, ids[k, 0], size, d415.C, d415.coeffs)
+                print ("n = %d" % j)
                 w2k[i] = w2k[indices.index(ids[k, 0])].dot(f.inv(c2k_k)).dot(c2k_i)
                 break
         if contain_know:
@@ -66,11 +71,16 @@ np.save(path_result + "w2k_init", f.rvecs6__t_4_4s(w2k[1:]))  # exclude first on
 c2w = np.zeros([n, 6])
 for i in range(n):
     color = cv2.imread(path_img % i)
+    param = cv2.aruco.DetectorParameters_create()
+    param.cornerRefinementMethod = corner_refinement
     corners, ids, _ = cv2.aruco.detectMarkers(color, d415.aruco_dict)
     index = ids[0, 0]
     rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[0], size, d415.C, d415.coeffs)
     c2k = f.t_4_4__rvec(rvec.reshape([3, ]), tvec.reshape([3, ]))
-    c2w[i] = f.rvec6__t_4_4(c2k.dot(f.inv(w2k[indices.index(index)])))
+    try:
+        c2w[i] = f.rvec6__t_4_4(c2k.dot(f.inv(w2k[indices.index(index)])))
+    except Exception:
+        raise Exception("mis-detect in photo: %d" % i)
 # print(c2w)
 np.save(path_result + "c2w_init", c2w)
 

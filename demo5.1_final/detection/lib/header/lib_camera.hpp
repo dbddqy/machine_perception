@@ -21,6 +21,13 @@ namespace CameraConfig {
                 0., 0., 1.;
         return temp;
     }();
+    static const Eigen::Matrix<double, 3, 4> M_ext = [] {
+        Eigen::Matrix<double, 3, 4> temp;
+        temp << fx, 0., ppx, 0.,
+                0., fy, ppy, 0.,
+                0., 0., 1., 0.;
+        return temp;
+    }();
     static const Eigen::Matrix3d MInv = M.inverse();
     static const Eigen::VectorXd distortion = [] {
         Eigen::VectorXd temp(5);

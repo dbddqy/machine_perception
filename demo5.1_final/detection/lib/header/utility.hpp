@@ -6,6 +6,7 @@
 #define DETECTION_UTILITY_HPP
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <string>
 
 #define LEN_CYL 7
@@ -27,6 +28,10 @@ namespace utility {
     double line_closest_param(Eigen::Vector3d start, Eigen::Vector3d dir, Eigen::Vector3d point);
 
     Cylinder get_seg(Cylinder pole, double start_param, double r);
+
+    // start_param range [0.0, 1.0]
+    // end_param range [0.0, 1.0]
+    Cylinder cylinder_seg(Cylinder pole, double start_param, double end_param);
 }
 
 

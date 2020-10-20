@@ -70,6 +70,13 @@ Cylinder utility::get_seg(Cylinder pole, double start_param, double r) {
     return Cylinder(temp);
 }
 
+Cylinder utility::cylinder_seg(Cylinder pole, double start_param, double end_param) {
+    double length = Eigen::Vector3d(pole[4], pole[5], pole[6]).norm();
+    double temp[LEN_CYL] = {pole[0], pole[1]+start_param*pole[4], pole[2]+start_param*pole[5], pole[3]+start_param*pole[6],
+                            (end_param-start_param)*pole[4], (end_param-start_param)*pole[5], (end_param-start_param)*pole[6]};
+    return Cylinder(temp);
+}
+
 double utility::line_closest_param(Eigen::Vector3d start, Eigen::Vector3d dir, Eigen::Vector3d point) {
     return (point-start).dot(dir) / dir.norm();
 }

@@ -54,12 +54,24 @@ namespace detection {
 
     void downsample_cloud(PointCloudG cloud, float size);
 
+    void remove_plane(PointCloudG cloud);
+
+    void pass_through(PointCloudG cloud, double pass_through_height);
+
     Cylinder ransac(PointCloudG cloud, float radius, float dis_threshold);
 
     Cylinder fitting(PointCloudG cloud, Cylinder guess);
 
     Cylinder finite_seg(PointCloudG cloud, Cylinder pole);
 
+    void draw_axis(cv::Mat img, Cylinder pole, Eigen::Isometry3d c2w,
+                  cv::Scalar color=cv::Scalar(255, 0, 0), int width=2);
+
+    void draw_axes(cv::Mat img, std::vector<Cylinder> poles, Eigen::Isometry3d c2w,
+                   cv::Scalar color=cv::Scalar(255, 0, 0), int width=2);
+
+    double getDeviation(cv::Mat color, cv::Mat depth, Cylinder pole, Eigen::Isometry3d c2w, int divide,
+                        cv::Scalar point_color=cv::Scalar(255, 0, 0), int size=2, int thickness=1, bool plot=true);
 }
 
 #endif //DETECTION_LIB_DET_HPP

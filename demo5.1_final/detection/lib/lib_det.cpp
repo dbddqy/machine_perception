@@ -7,6 +7,7 @@
 #include <opencv2/core/eigen.hpp>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/passthrough.h>
 #include <ceres/ceres.h>
 // for ransac
 #include <pcl/features/normal_3d.h>
@@ -101,6 +102,46 @@ void detection::downsample_cloud(PointCloudG cloud, float size) {
     vg.filter(*cloud);
 }
 
+void detection::remove_plane(PointCloudG cloud) {
+    // Estimate point normals
+    pcl::NormalEstimation<PointG, pcl::Normal> ne;
+    pcl::search::KdTree<PointG>::Ptr tree (new pcl::search::KdTree<PointG> ());
+    pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
+    ne.setSearchMethod (tree);
+    ne.setInputCloud (cloud);
+    ne.setKSearch (24);
+    ne.compute (*cloud_normals);
+    // Create the segmentation object for the planar model and set all the parameters
+    pcl::SACSegmentationFromNormals<PointG, pcl::Normal> seg;
+    seg.setOptimizeCoefficients (true);
+    seg.setModelType (pcl::SACMODEL_NORMAL_PLANE);
+    seg.setNormalDistanceWeight (0.1);
+    seg.setMethodType (pcl::SAC_RANSAC);
+    seg.setMaxIterations (100000);
+    seg.setDistanceThreshold (0.06);
+    seg.setInputCloud (cloud);
+    seg.setInputNormals (cloud_normals);
+    // Obtain the plane inliers and coefficients
+    pcl::ModelCoefficients::Ptr coefficients_plane (new pcl::ModelCoefficients), coefficients_cylinder (new pcl::ModelCoefficients);
+    pcl::PointIndices::Ptr inliers_plane (new pcl::PointIndices), inliers_cylinder (new pcl::PointIndices);
+    seg.segment (*inliers_plane, *coefficients_plane);
+    cout << "Plane coefficients: " << *coefficients_plane << endl;
+    // Remove the planar inliers, extract the rest
+    pcl::ExtractIndices<PointG> extract;
+    extract.setInputCloud (cloud);
+    extract.setIndices (inliers_plane);
+    extract.setNegative (true);
+    extract.filter (*cloud);
+}
+
+void detection::pass_through(PointCloudG cloud, double pass_through_height) {
+    pcl::PassThrough<PointG> pass;
+    pass.setInputCloud (cloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (pass_through_height, 1.5);
+    pass.filter (*cloud);
+}
+
 Cylinder detection::ransac(PointCloudG cloud, float radius, float dis_threshold) {
     // Estimate point normals
     pcl::NormalEstimation<PointG, pcl::Normal> ne;
@@ -116,9 +157,9 @@ Cylinder detection::ransac(PointCloudG cloud, float radius, float dis_threshold)
     seg.setModelType (pcl::SACMODEL_CYLINDER);
     seg.setMethodType (pcl::SAC_RANSAC);
     seg.setNormalDistanceWeight (0.1);
-    seg.setMaxIterations (200000);
+    seg.setMaxIterations (2000000);
     seg.setDistanceThreshold (dis_threshold);
-    seg.setRadiusLimits (radius*0.6, radius*1.4);
+    seg.setRadiusLimits (radius*0.4, radius*1.6);
     seg.setInputCloud (cloud);
     seg.setInputNormals (cloud_normals);
     // Obtain the cylinder inliers and coefficients
@@ -212,6 +253,70 @@ Cylinder detection::finite_seg(PointCloudG cloud, Cylinder pole) {
     return Cylinder(temp);
 }
 
+void detection::draw_axis(Mat img, Cylinder pole, Eigen::Isometry3d c2w, Scalar color, int width) {
+    Eigen::Vector3d p0_3d(pole[1], pole[2], pole[3]);
+    Eigen::Vector3d p1_3d(pole[1]+pole[4], pole[2]+pole[5], pole[3]+pole[6]);
 
+    Eigen::Vector3d p0_2d = C::M * (c2w * p0_3d);
+    Eigen::Vector3d p1_2d = C::M * (c2w * p1_3d);
+    Point p0 = Point(p0_2d[0] / p0_2d[2], p0_2d[1] / p0_2d[2]);
+    Point p1 = Point(p1_2d[0] / p1_2d[2], p1_2d[1] / p1_2d[2]);
+    // draw
+    line(img, p0, p1, color, width);
+}
 
+void detection::draw_axes(Mat img, vector<Cylinder> poles, Eigen::Isometry3d c2w, Scalar color, int width) {
+    for (int i = 0; i < poles.size(); i++)
+        draw_axis(img, poles[i], c2w, color, width);
+}
+
+double detection::getDeviation(cv::Mat color, cv::Mat depth, Cylinder pole, Eigen::Isometry3d c2w, int divide,
+                           cv::Scalar point_color, int size, int thickness, bool plot) {
+    double start=0.0;
+    double r = pole[0]; // mm
+    Eigen::Isometry3d w2c = c2w.inverse();
+
+    Eigen::Vector3d p0_3d(pole[1], pole[2], pole[3]);
+    Eigen::Vector3d p1_3d(pole[1]+pole[4], pole[2]+pole[5], pole[3]+pole[6]);
+    Eigen::Vector3d v_a, v_c, v_p, v_p2c, v_h;
+    v_a << pole[4], pole[5], pole[6]; // axis vec
+    double gap = v_a.norm() / divide;
+    v_a /= v_a.norm(); // axis vec
+    v_c << w2c.matrix()(0, 3), w2c.matrix()(1, 3), w2c.matrix()(2, 3); // camera center
+    v_p = p0_3d; // axis start point
+    v_p2c = v_c - v_p; // axis start to camera center
+    v_h = v_p2c - (v_p2c.dot(v_a) * v_a); // perpendicular to the axis
+    v_h /= sqrt(v_h.dot(v_h)); // normalization
+    vector<Point> check_points;
+    vector<double> check_depth;
+    for (int i = 0; i < divide; ++i) {
+        Eigen::Vector3d p_t = v_p + (start+gap*i) * v_a; // point on axis, evey 10 mm
+        Eigen::Vector3d p_t_offset = p_t + v_h * r;
+        Eigen::Vector3d p_3d_t (p_t_offset[0], p_t_offset[1], p_t_offset[2]);
+        Eigen::Vector3d p_2d_t = C::M * (c2w * p_3d_t);
+        Point p_temp(p_2d_t[0] / p_2d_t[2], p_2d_t[1] / p_2d_t[2]);
+        if (p_temp.x > 0 && p_temp.x < color.cols && p_temp.y > 0 && p_temp.y < color.rows) {
+            check_depth.push_back(p_2d_t[2]);
+            check_points.emplace_back(p_2d_t[0] / p_2d_t[2], p_2d_t[1] / p_2d_t[2]);
+        }
+    }
+    double cost = 0.;
+    int num_points = 0;
+    for (int i = 0; i < check_points.size(); ++i) {
+        circle(color, check_points[i], size, point_color, thickness);
+        auto d = (double)depth.at<uint16_t>(check_points[i]);
+        if (d != 0.0) {
+//            cout << "d: " << d << endl;
+//            cout << "check_d; " << check_depth[i] << endl;
+            double d_temp = abs(d / 10. - check_depth[i] * 1000.0);
+            stringstream s_temp;
+            s_temp << setprecision(5) << d_temp;
+            putText(color, s_temp.str(), check_points[i], CV_FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 0, 0), 1.4);
+            cost += d_temp;
+            ++ num_points;
+        }
+    }
+    cost = cost / num_points;
+    return cost;
+}
 

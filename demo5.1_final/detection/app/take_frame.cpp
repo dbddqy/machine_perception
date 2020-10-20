@@ -39,9 +39,9 @@ int main(int argc, char **argv) {
         imshow("color", color_drawn);
 
         if (key == 's') {
+            imwrite((file_color_drawn % num_saved).str(), color_drawn);
             imwrite((file_color % num_saved).str(), color);
             imwrite((file_depth % num_saved).str(), depth);
-            imwrite((file_color_drawn % num_saved).str(), color_drawn);
             cout << "frame " << num_saved << " saved!" << endl;
             ++ num_saved;
         }

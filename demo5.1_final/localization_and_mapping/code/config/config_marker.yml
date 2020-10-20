@@ -1,12 +1,17 @@
 # marker
-path_img: "../data_2D/"
-path_result: "../../data/localization_and_mapping/"
-save_init_index: 30
-num_photos: 30
-num_markers: 7
+path_img: "../data_2D/built2/"
+path_result: "../../data/localization_and_mapping/built2/"
+save_init_index: 0
+save_depth: false
+num_photos: 62
+# num_markers: 13
+# num_markers: 27
+num_markers: 22
 marker_size: 0.07681882  # size in meter
 reorder: true
-reorder_indices_list: [0, 1, 2, 3, 4, 5, 7]
+# reorder_indices_list: [48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36]
+# reorder_indices_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20]
+reorder_indices_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
 
 # corner_refinement
 # CORNER_REFINE_NONE: 0

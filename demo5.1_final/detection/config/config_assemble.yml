@@ -1,19 +1,22 @@
 # task definition
-task_index: 5
+task_index: 35
 num_poles: 37
 
 # path
+path_design: "../../../data/design/design.txt"
 path_topo: "../../../data/design/design_seg.txt"
-path_w2k: "../../../data/localization_and_mapping/w2k.txt"
-path_det_result: "../../../data/detection/result_b_%d_-1.txt"  # detection result
-path_adt_result: "../../../data/adaptation/result_%d.txt"  # adaptation result
+path_w2k: "../../../data/localization_and_mapping/built2/w2k.txt"
+path_adt_result: "../../../data/adaptation/result_target_%d.txt"  # adaptation result
 
 # marker
-num_photos: 9
-num_markers: 7
+# num_markers: 13
+# num_markers: 27
+num_markers: 22
 marker_size: 0.07681882  # size in meter
 reorder: true
-reorder_indices_list: [0, 1, 2, 3, 4, 5, 7]
+# reorder_indices_list: [48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36]
+# reorder_indices_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20]
+reorder_indices_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
 
 # corner_refinement
 # CORNER_REFINE_NONE: 0
@@ -21,3 +24,13 @@ reorder_indices_list: [0, 1, 2, 3, 4, 5, 7]
 # CORNER_REFINE_CONTOUR: 2
 # CORNER_REFINE_APRILTAG: 3
 corner_refinement: 3
+
+# augmentation
+start_param: 0.7  # range [0.0, 1.0]
+end_param: 0.95  # range [0.0, 1.0]
+
+divide: 6
+point_size: 3
+thickness: 2
+line_width_selectd: 2
+line_width_rest: 1

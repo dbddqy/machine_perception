@@ -18,7 +18,7 @@ with open("config/config_marker.yml", 'r') as file:
 
 n = conf["num_photos"]   # number of photos
 m = conf["num_markers"]  # number of  markers
-path_img = conf["path_img"] + "marker_%d.png"
+path_img = conf["path_img"] + "color_%d.png"
 path_result = conf["path_result"]
 view_corner = conf["view_corner"]
 corner_refinement = conf["corner_refinement"]
@@ -130,7 +130,7 @@ for i in range(n):
     count_i_sum += count_i_th_photo
 
 
-ls = f.least_squares(residual, x0, jac_sparsity=A, verbose=2, x_scale='jac', ftol=1e-8)
+ls = f.least_squares(residual, x0, jac_sparsity=A, verbose=2, x_scale='jac', ftol=1e-6)
 # ls = f.least_squares(residual, x0, verbose=2, x_scale='jac', ftol=1e-4, method='trf')
 
 print(ls.x[6 * n: 6 * n + 6])
@@ -148,3 +148,8 @@ np.savetxt(path_result + "w2k.txt", final_w2k, fmt="%f")
 
 for i in range(len(final_w2k)):
     np.savetxt(path_result + ("w2k_%d.txt" % i), final_w2k[i], fmt="%f")
+
+final_c2w = []
+for i in range(n):
+    final_c2w.append(ls.x[6*i: 6 * (i + 1)].flatten())
+np.savetxt(path_result + "c2w.txt", final_c2w, fmt="%f")

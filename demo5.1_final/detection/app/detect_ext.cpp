@@ -1,5 +1,5 @@
 //
-// Created by yue on 23.09.20.
+// Created by ruqing on 06.10.20.
 //
 
 #include <fstream>
@@ -124,17 +124,9 @@ int main(int argc, char **argv) {
      * ============================ */
     PointCloudG cloud_full(new pcl::PointCloud<PointG>);
     pcl::PCDWriter writer;
-    for (int i = 0; i < num_angles; ++i) {
-        Mat color = imread((file_color % (i*num_photos_per_angle)).str());
-        Mat depth = Mat::zeros(Size(1920, 1080), CV_16UC1);
-        // get average of multiple depth frames
-        double dis_average = 0.0;
-        for (int frame_index = 0; frame_index < num_photos_per_angle; ++frame_index) {
-            Mat depth_temp = imread((file_depth % (i*num_photos_per_angle+frame_index)).str(), CV_LOAD_IMAGE_UNCHANGED);
-            depth += depth_temp;
-        }
-        depth /= num_photos_per_angle;
-
+    for (int i = 0; i < num_photos; ++i) {
+        Mat color = imread((file_color % i).str());
+        Mat depth = imread((file_depth % i).str(), CV_LOAD_IMAGE_UNCHANGED);
         vector< vector<Point2f> > corners;
         vector<int> ids;
         det::detectMarker(color, corners, ids, marker_size, view_corner, CornerRefineMethod(corner_refinement));
@@ -156,34 +148,6 @@ int main(int argc, char **argv) {
     det::downsample_cloud(cloud_full, leaf_size);
     cout << "final cloud has " << cloud_full->points.size() << " points." << endl;
     writer.write((file_cloud%"full").str(), *cloud_full, false);
-
-    /* ================
-     * cylinder fitting
-     * ================ */
-    Cylinder c;
-    if (task_type == det::SCAN_MATERIAL) {
-        det::pass_through(cloud_full, pass_through_height);
-//        det::remove_plane(cloud_full);
-//        det::clean_cloud(cloud_full, mean_k/2);
-//        det::remove_plane(cloud_full);
-        writer.write((file_cloud%"remove_plane").str(), *cloud_full, false);
-        c = det::ransac(cloud_full, radius, ransac_thresh);
-        writer.write((file_cloud%"ransac").str(), *cloud_full, false);
-    }
-
-    c = det::fitting(cloud_full, get_seg(pole, seg_param - 0.5 * seg_length, radius));
-    c = det::finite_seg(cloud_full, c);
-    cout << "final parameters: \n" << c  << endl;
-
-    /* ================
-     * writing to file
-     * ================ */
-    ofstream out_file;
-    out_file.open((boost::format(path_result)%target_index).str());
-    for (int i = 0; i < LEN_CYL; ++i) {
-        out_file << c[i] << " ";
-    }
-    out_file.close();
 
     delete data_design;
     return 0;

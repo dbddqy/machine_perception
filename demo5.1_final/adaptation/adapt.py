@@ -167,6 +167,10 @@ def cost(x):
 res = minimize(cost, x0, method="SLSQP", constraints=[eq_cons, ineq_cons], options={"fto1": 1e-9, "disp": True})
 print(res.x)
 
+# print angle
+print("angle: ")
+print(angle_l_l(tran(res.x, m0), b)*180/pi)
+
 np.savetxt(path_result_pre % task_index, pre_tran.reshape([1, 6]), fmt="%f")
 np.savetxt(path_result % task_index, res.x.reshape([1, 6]), fmt="%f")
 np.savetxt(path_result_target % task_index, tran(res.x, m1).reshape([1, 7]), fmt="%f")
