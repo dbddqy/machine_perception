@@ -67,6 +67,15 @@ Mat t_4_4__rvec(Vec3d rvec, Vec3d tvec) {
     return t_4_4;
 }
 
+int findIndex(vector<int> indices, int index) {
+    auto iElement = find(indices.begin(), indices.end(), index);
+    if( iElement != indices.end() ) {
+        return distance(indices.begin(),iElement);
+    } else {
+        return -1;
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         cout << "please enter number of frames" << endl;
@@ -90,8 +99,13 @@ int main(int argc, char **argv) {
 
 //    PointCloudC clouds_full[num_frames];
     PC_C cloud_aligned (new pcl::PointCloud<P_C>);
+    vector<int> skip_indices = {40, 41, 42, 43, 44, 46,
+                                49,
+                                52};
     // load clouds
     for (int frame_index = 0; frame_index < num_frames; ++frame_index) {
+        // skip index
+        if (findIndex(skip_indices, frame_index) != -1) continue;
         // load image
         Mat matColor = imread((boost::format("../data2D/color_%d.png") % frame_index).str());
         Mat matDepth = imread((boost::format("../data2D/depth_%d.png") % frame_index).str(), CV_LOAD_IMAGE_UNCHANGED);
@@ -121,7 +135,7 @@ int main(int argc, char **argv) {
         vg.filter(*cloud_t);
         // remove outliers
         sor.setInputCloud (cloud_t);
-        sor.setMeanK (5);
+        sor.setMeanK (20);
         sor.setStddevMulThresh (0.5);
         sor.filter (*cloud_t);
 
@@ -153,7 +167,7 @@ int main(int argc, char **argv) {
 ////    cloud_merged->height = 1;
 ////    cloud_merged->resize(cloud_merged->width*cloud_merged->height);
     vg.setInputCloud(cloud_aligned);
-    float size = 2.0f;
+    float size = 4.0f;
     vg.setLeafSize(size, size, size);
     vg.filter(*cloud_aligned);
     writer.write ("../data3D/cloud_aligned.pcd", *cloud_aligned, false);
